@@ -2,10 +2,11 @@ import { FC } from "react";
 import styled from "styled-components";
 import Grid from "@/shared/components/Grid";
 import Title from "@/shared/components/Title";
+import gameIcon from "assets/game.svg";
 
 const channels = [
   {
-    image: "/src/assets/game.svg",
+    image: gameIcon,
     name: "小游戏",
     path: "/game",
   },

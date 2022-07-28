@@ -21,6 +21,7 @@ const renderNestRoute = (routes: RouteType[]) => {
   return routes.map((route) => {
     const { path, children, index, element: Element } = route;
     return index ? (
+      // @ts-ignore
       <Route key={"/"} index element={<Element />}>
         {Array.isArray(children) ? renderNestRoute(children) : null}
       </Route>
