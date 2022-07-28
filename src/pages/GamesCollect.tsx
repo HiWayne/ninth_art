@@ -1,11 +1,11 @@
 import Grid from "@/shared/components/Grid";
 import Title from "@/shared/components/Title";
-import styled from "styled-components";
+import fuziIcon from "assets/fuzi.jpeg";
 
 const channels = [
   {
     path: "/game/fuzi",
-    image: "/src/assets/fuzi.jpeg",
+    image: fuziIcon,
     name: "找福字",
   },
 ];
