@@ -13,23 +13,20 @@ import FuziCard from "./shared/components/FuziCard";
 import Notification, {
   NotificationTypeEnum,
 } from "./shared/components/Notification";
+import Tip from "./shared/components/Tip";
 import type { Fuzi, GameResultEnum } from "./shared/types";
 import useStore from "store/index";
 import shallow from "zustand/shallow";
 import { TotalCountComputer } from "@/store/fuzi";
 import { PROBABILITY, TOTAL_TIME } from "./config";
 import { random } from "@/shared/utils/random";
+import Title from "./shared/components/Title";
+import Subtitle from "./shared/components/SubTitle";
 
 const FuziWrapper = styled.main`
   user-select: none;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-`;
-
-const Title = styled.h1`
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
 `;
 
 const StartButtonWrapper = styled.div`
@@ -39,9 +36,11 @@ const StartButtonWrapper = styled.div`
 `;
 
 const StartButton = styled.button`
+  margin-top: 20px;
   display: inline-block;
-  width: 70px;
-  height: 30px;
+  width: 80px;
+  height: 35px;
+  font-size: 16px;
   background: rgba(246, 87, 55, 0.961);
   color: #fff;
   border: none;
@@ -49,14 +48,14 @@ const StartButton = styled.button`
   cursor: pointer;
 `;
 
-const TipWrapper = styled(({ className, children }) => (
+const StatisticsWrapper = styled(({ className, children }) => (
   <div className={className}>{children}</div>
 ))`
   margin: 30px 0;
   font-size: 14px;
 `;
 
-const Tip = styled.p`
+const Statistics = styled.p`
   line-height: 20px;
   text-align: center;
 `;
@@ -125,12 +124,16 @@ const FuziGame = () => {
     shallow
   );
 
-  const [addOvertime, addTimePenalty, setSpeededTime] = useStore<
-    [(time: number) => void, (time: number) => void, (time: number) => void]
+  const [setOvertime, setTimePenalty, setSpeededTime] = useStore<
+    [
+      (time: number | ((prevTime: number) => number)) => void,
+      (time: number | ((prevTime: number) => number)) => void,
+      (time: number) => void
+    ]
   >(
     (state) => [
-      state.fuzi.addOvertime,
-      state.fuzi.addTimePenalty,
+      state.fuzi.setOvertime,
+      state.fuzi.setTimePenalty,
       state.fuzi.setSpeededTime,
     ],
     shallow
@@ -225,15 +228,15 @@ const FuziGame = () => {
     if (totalCount >= 10 && latestCountNoFind > 7) {
       setNotificationType("good");
       setNotificationText("+2s：获得buff，时间加2秒");
-      addOvertime(2000);
+      setOvertime((prevTime) => prevTime + 2000);
       setShowNotification(false);
       setTimeout(() => {
         setShowNotification(true);
       }, 50);
-    } else if (totalCount >= 7 && latestCountNoFind > 5) {
+    } else if (totalCount >= 7 && latestCountNoFind >= 5) {
       setNotificationType("good");
       setNotificationText("+1s：获得buff，时间加1秒");
-      addOvertime(1000);
+      setOvertime((prevTime) => prevTime + 1000);
       setShowNotification(false);
       setTimeout(() => {
         setShowNotification(true);
@@ -251,7 +254,7 @@ const FuziGame = () => {
     decreaseRemainingTime(500);
     setNotificationType("bad");
     setNotificationText("-0.5s：点错啦，时间减0.5秒");
-    addTimePenalty(500);
+    setTimePenalty((prevTime) => prevTime + 500);
     setShowNotification(false);
     setTimeout(() => {
       setShowNotification(true);
@@ -260,17 +263,23 @@ const FuziGame = () => {
 
   return (
     <FuziWrapper>
-      <Title>限定时间内找出逆时针旋转的福字</Title>
+      <Title>找福字</Title>
+      <Subtitle>限定时间内</Subtitle>
+      <Subtitle>找出所有逆时针旋转的福字</Subtitle>
+      <Tip>
+        当要找的福字&gt;=7个时，每找对一个会加时2秒哦。未找到的福字&lt;5个时效果消失，好好利用吧
+      </Tip>
+      <Tip>找错福字会扣时0.5秒🥺</Tip>
       <StartButtonWrapper>
         <StartButton onClick={startGame}>开始</StartButton>
       </StartButtonWrapper>
-      <TipWrapper>
-        <Tip>限时8秒</Tip>
-        <Tip>
+      <StatisticsWrapper>
+        <Statistics>限时8秒</Statistics>
+        <Statistics>
           还有<BoldText>{countNoFind}</BoldText>个没找到，剩余
           <BoldText>{remainingTimeForShow}</BoldText>秒
-        </Tip>
-      </TipWrapper>
+        </Statistics>
+      </StatisticsWrapper>
       <CardsList>
         {fuziCards.map((item, index) => {
           return (

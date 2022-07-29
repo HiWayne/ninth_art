@@ -1,6 +1,6 @@
 import Grid from "@/shared/components/Grid";
 import Title from "@/shared/components/Title";
-import fuziIcon from "assets/fuzi.jpeg";
+import fuziIcon from "assets/images/fuzi.jpeg";
 
 const channels = [
   {

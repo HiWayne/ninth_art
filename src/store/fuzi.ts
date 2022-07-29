@@ -19,8 +19,8 @@ export interface FuziStore {
   decreaseCountNoFind: () => void;
   setRemainingTime: (remainingTime: number) => void;
   setSpeededTime: (speededTime: number) => void;
-  addOvertime: (time: number) => void;
-  addTimePenalty: (time: number) => void;
+  setOvertime: (time: number | ((prevTime: number) => number)) => void;
+  setTimePenalty: (time: number | ((prevTime: number) => number)) => void;
   decreaseRemainingTime: (interval: number) => void;
   setGameResult: (gameResult: GameResultEnum) => void;
   setFuziCards: (fuziCards: Fuzi[]) => void;
@@ -86,14 +86,22 @@ const createFuziStore: (
       state.fuzi.speededTime = speededTime;
     });
   },
-  addOvertime(time: number) {
+  setOvertime(time: number | ((prevTime: number) => number)) {
     set((state) => {
-      state.fuzi.overtime += time;
+      if (typeof time === "function") {
+        state.fuzi.overtime = time(state.fuzi.overtime);
+      } else {
+        state.fuzi.overtime = time;
+      }
     });
   },
-  addTimePenalty(time: number) {
+  setTimePenalty(time: number | ((prevTime: number) => number)) {
     set((state) => {
-      state.fuzi.timePenalty += time;
+      if (typeof time === "function") {
+        state.fuzi.timePenalty = time(state.fuzi.timePenalty);
+      } else {
+        state.fuzi.timePenalty = time;
+      }
     });
   },
   decreaseRemainingTime(interval: number) {
