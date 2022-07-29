@@ -2,7 +2,7 @@ import { FC } from "react";
 import styled from "styled-components";
 import Grid from "@/shared/components/Grid";
 import Title from "@/shared/components/Title";
-import gameIcon from "assets/game.svg";
+import gameIcon from "assets/images/game.svg";
 
 const channels = [
   {

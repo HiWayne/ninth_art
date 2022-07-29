@@ -7,29 +7,41 @@ import { Fuzi, GameResultEnum } from "../types";
 import { TOTAL_TIME } from "../../config";
 
 const RestartButton = styled(({ ...props }) => {
-  const [setFuziCards, setRemainingTime, setGameResult, setCountNoFind] =
-    useStore<
-      [
-        (fuziCards: Fuzi[]) => void,
-        (remainingTime: number) => void,
-        (gameResult: GameResultEnum) => void,
-        (countNoFind: number) => void
-      ]
-    >(
-      (state) => [
-        state.fuzi.setFuziCards,
-        state.fuzi.setRemainingTime,
-        state.fuzi.setGameResult,
-        state.fuzi.setCountNoFind,
-      ],
-      shallow
-    );
+  const [
+    setFuziCards,
+    setRemainingTime,
+    setGameResult,
+    setCountNoFind,
+    setOvertime,
+    setTimePenalty,
+  ] = useStore<
+    [
+      (fuziCards: Fuzi[]) => void,
+      (remainingTime: number) => void,
+      (gameResult: GameResultEnum) => void,
+      (countNoFind: number) => void,
+      (time: number | ((prevTime: number) => number)) => void,
+      (time: number | ((prevTime: number) => number)) => void
+    ]
+  >(
+    (state) => [
+      state.fuzi.setFuziCards,
+      state.fuzi.setRemainingTime,
+      state.fuzi.setGameResult,
+      state.fuzi.setCountNoFind,
+      state.fuzi.setOvertime,
+      state.fuzi.setTimePenalty,
+    ],
+    shallow
+  );
 
   const restart = useCallback(() => {
     setFuziCards([]);
     setRemainingTime(TOTAL_TIME);
     setGameResult(0);
     setCountNoFind(0);
+    setOvertime(0);
+    setTimePenalty(0);
   }, [setFuziCards, setRemainingTime, setGameResult, setCountNoFind]);
 
   return <button onClick={restart} {...props}></button>;
