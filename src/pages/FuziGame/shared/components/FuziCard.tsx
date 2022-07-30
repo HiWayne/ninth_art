@@ -1,12 +1,28 @@
-import { FC } from "react";
+import { isMobile } from "@/shared/utils/isMobile";
+import { FC, MouseEventHandler, TouchEventHandler } from "react";
 import styled from "styled-components";
 import { FuziCardProps } from "../types";
 
-const FuziCard = styled<FC<FuziCardProps>>(({ className, data, onClick }) => (
-  <div className={className} onClick={onClick}>
-    福
-  </div>
-))`
+const FuziCard = styled<FC<FuziCardProps>>(
+  ({ className, data, onClick, onTouch }) =>
+    isMobile() ? (
+      <div
+        className={className}
+        onClick={onClick}
+        onTouchStart={onTouch as TouchEventHandler<HTMLDivElement>}
+      >
+        福
+      </div>
+    ) : (
+      <div
+        className={className}
+        onClick={onClick}
+        onMouseDown={onTouch as MouseEventHandler<HTMLDivElement>}
+      >
+        福
+      </div>
+    )
+)`
   display: inline-block;
   height: 60px;
   background: red;

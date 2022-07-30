@@ -8,7 +8,7 @@ import { filterBlur } from "shared/styles/index";
 import { useState } from "react";
 import Score from "./shared/components/Score";
 import RestartButton from "./shared/components/RestartButton";
-import useStopScrollPropagation from "@/shared/hooks/useStopScrollPropagation";
+import useStopScroll from "@/shared/hooks/useStopScroll";
 
 type FireworksProps = {
   children?: React.ReactNode;
@@ -18,10 +18,8 @@ type FireworksProps = {
 };
 
 const Fireworks = ({ children, options, style, className }: FireworksProps) => {
-  const container = useRef<HTMLDivElement>(null);
   const fireworks = useRef<FireworksJs | null>(null);
-
-  useStopScrollPropagation(container);
+  const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // React.StrictMode in React18+ will lead useEffect(() => {}, []) called twice.
@@ -45,6 +43,10 @@ const Fireworks = ({ children, options, style, className }: FireworksProps) => {
 const FireWorksCanvas = styled(({ className }) => {
   const [showRestart, setShowRestart] = useState(false);
 
+  const container = useRef<HTMLDivElement>(null);
+
+  useStopScroll(container);
+
   useEffect(() => {
     const timeoutTimer = setTimeout(() => {
       setShowRestart(true);
@@ -56,7 +58,7 @@ const FireWorksCanvas = styled(({ className }) => {
   }, []);
 
   return (
-    <>
+    <div ref={container}>
       <Fireworks
         options={{
           rocketsPoint: {
@@ -68,7 +70,7 @@ const FireWorksCanvas = styled(({ className }) => {
       />
       <Score />
       {showRestart ? <RestartButton>再来一次</RestartButton> : null}
-    </>
+    </div>
   );
 })`
   position: fixed;

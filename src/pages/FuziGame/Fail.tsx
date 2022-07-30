@@ -3,11 +3,12 @@ import RestartButton from "./shared/components/RestartButton";
 import Icon from "shared/components/Icon";
 import failIcon from "assets/images/fail.jpg";
 import useStore from "@/store";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { getFailText } from "./shared/utils/getFailText";
 import LineText from "./shared/components/LineText";
 import LineWhiteTitle from "./shared/components/LineWhiteTitle";
 import RedText from "./shared/components/RedText";
+import useStopScroll from "@/shared/hooks/useStopScroll";
 
 const TextWrapper = styled.div`
   margin-left: 20px;
@@ -67,8 +68,12 @@ const Content = styled(({ className }) => {
 `;
 
 const Fail = styled(({ className }) => {
+  const container = useRef<HTMLDivElement>(null);
+
+  useStopScroll(container);
+
   return (
-    <div className={className}>
+    <div className={className} ref={container}>
       <Content />
       <RestartButton>再来一次</RestartButton>
     </div>

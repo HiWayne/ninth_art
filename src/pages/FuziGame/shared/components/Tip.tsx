@@ -4,7 +4,7 @@ const Tip = styled.p`
   position: relative;
   margin: 8px auto;
   padding-left: 10px;
-  width: 260px;
+  width: 270px;
   font-size: 12px;
   line-height: 14px;
   color: #999;

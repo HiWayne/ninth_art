@@ -1,4 +1,3 @@
-import useImmediateState from "@/shared/hooks/useImmediateState";
 import {
   MutableRefObject,
   useCallback,
@@ -20,7 +19,12 @@ import shallow from "zustand/shallow";
 import { TotalCountComputer } from "@/store/fuzi";
 import { PROBABILITY, TOTAL_TIME } from "./config";
 import { random } from "@/shared/utils/random";
-import Title from "./shared/components/Title";
+import {
+  TitleZhao,
+  TitleFu,
+  TitleZi,
+  TitleWrapper,
+} from "./shared/components/Titles";
 import Subtitle from "./shared/components/SubTitle";
 
 const FuziWrapper = styled.main`
@@ -263,7 +267,11 @@ const FuziGame = () => {
 
   return (
     <FuziWrapper>
-      <Title>找福字</Title>
+      <TitleWrapper>
+        <TitleZhao>找</TitleZhao>
+        <TitleFu>福</TitleFu>
+        <TitleZi>字</TitleZi>
+      </TitleWrapper>
       <Subtitle>限定时间内</Subtitle>
       <Subtitle>找出所有逆时针旋转的福字</Subtitle>
       <Tip>
@@ -287,9 +295,12 @@ const FuziGame = () => {
               key={index}
               data={item}
               onClick={
+                item.isCounterclockwise ? undefined : handleClickCardIncorrectly
+              }
+              onTouch={
                 item.isCounterclockwise
                   ? () => handleClickCardCorrectly(index)
-                  : handleClickCardIncorrectly
+                  : undefined
               }
             />
           );
