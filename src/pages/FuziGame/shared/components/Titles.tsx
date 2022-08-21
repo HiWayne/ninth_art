@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import zhaoFont from "assets/fonts/zhao.otf";
-import fuFont from "assets/fonts/fu.otf";
-import ziFont from "assets/fonts/zi.otf";
+import zhaoFont from "../../assets/fonts/zhao.otf";
+import fuFont from "../../assets/fonts/fu.otf";
+import ziFont from "../../assets/fonts/zi.otf";
 
 export const TitleZhao = styled.span`
   @font-face {
