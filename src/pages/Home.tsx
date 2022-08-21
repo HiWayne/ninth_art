@@ -23,7 +23,12 @@ const Wrapper = styled.div`
 
 const Home: FC = () => (
   <Wrapper>
-    <Title>第九艺术 Ninth Art</Title>
+    <Title style={{ color: "#F56C6C", fontSize: "22px", marginBottom: "10px" }}>
+      Ninth Art
+    </Title>
+    <Title style={{ color: "#F56C6C", fontSize: "14px", marginTop: "0px" }}>
+      第九艺术
+    </Title>
     <Grid channels={channels} />
   </Wrapper>
 );
