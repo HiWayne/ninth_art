@@ -12,8 +12,8 @@ export class Seat extends Thing {
   // 账单
   bill: number;
 
-  constructor(type: ThingType) {
-    super(type);
+  constructor(x: number, y: number, type: ThingType) {
+    super('座位', x, y, type);
     this.use = false;
     this.size = 2;
     this.user = null;

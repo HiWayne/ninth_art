@@ -2,8 +2,8 @@ import { ThingType } from "../../types";
 import { Thing } from "./Thing";
 
 export class kitchenUtensil extends Thing {
-  constructor(type: ThingType) {
-    super(type);
+  constructor(x: number, y: number, type: ThingType) {
+    super('厨具', x, y, type);
     switch (type) {
       case "cheap":
         this.price = 50;

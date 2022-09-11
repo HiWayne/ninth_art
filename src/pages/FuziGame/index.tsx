@@ -78,7 +78,6 @@ const FuziGame = () => {
   const [notificationText, setNotificationText] = useState("");
   const [notificationType, setNotificationType] =
     useState<NotificationTypeEnum>("good");
-  // 用ref防止快速重复点击时，新状态还未及时应用到ui的情况
   const [fuziCards, setFuziCards, setFuzi] = useStore<
     [
       Fuzi[],

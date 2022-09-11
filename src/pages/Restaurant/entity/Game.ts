@@ -36,10 +36,10 @@ export class Game {
   updateUI() {
     this.updater();
   }
-  // 现实世界每500ms增加的时间（游戏中1天等于现实时间3分钟）
+  // 现实世界每1s增加的时间（游戏中1天等于现实时间2分钟）
   addTime() {
     if (this._isPlaying()) {
-      this.currentTimeInGame += 240000 * this.speed;
+      this.currentTimeInGame += 320000 * this.speed;
     } else {
       clearInterval(this.timeRecorder);
     }
@@ -62,7 +62,7 @@ export class Game {
     this._startCreateCustomer();
   }
   _recordTime() {
-    this.timeRecorder = setInterval(() => this.addTime(), 500);
+    this.timeRecorder = setInterval(() => this.addTime(), 1000);
   }
   pause() {
     this.status = 2;

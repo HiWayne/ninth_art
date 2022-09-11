@@ -1,17 +1,22 @@
 import { Text } from "@inlet/react-pixi";
 import dayjs from "dayjs";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { game } from "../index";
 import { themeColors } from "../assets/theme";
 
-export const GameTime = ({
-  time,
-  x,
-  y,
-}: {
-  time: number;
-  x: number;
-  y: number;
-}) => {
+export const GameTime = ({ x, y }: { x: number; y: number }) => {
+  const [time, setTime] = useState(game.getCurrentTimeInGame());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(game.getCurrentTimeInGame());
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   const timeText = useMemo(() => {
     const text1 = dayjs(time).format("YYYY年MM月DD日");
     let text2 = "";
@@ -38,13 +43,14 @@ export const GameTime = ({
         text2 = "星期六";
         break;
     }
-    const text3 = dayjs(time).format("HH:mm");
+    const text3 = dayjs(time).format("HH时");
     return `${text1} ${text2} ${text3}`;
   }, [time]);
   return (
     <Text
-      x={x}
-      y={y}
+      x={window.innerWidth - (y / window.innerHeight) * x}
+      y={(x / window.innerWidth) * window.innerHeight}
+      rotation={Math.PI / 2}
       text={`📅 ${timeText}`}
       style={{ fontSize: "12px", fill: [themeColors.TEXT] }}
     />

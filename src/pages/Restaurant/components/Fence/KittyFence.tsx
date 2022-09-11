@@ -1,7 +1,7 @@
 import { Fence } from "./Fence";
-import kittyFenceImage from "../../assets/images/furnish/kitty-fence.png";
+import kittyFenceImage from "../../assets/images/furnish/fence/kitty-fence.png";
 
-export const KittyEnclosedFence = ({
+export const KittyFence = ({
   x,
   y,
   image,
