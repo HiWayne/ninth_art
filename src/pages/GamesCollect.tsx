@@ -8,13 +8,18 @@ const channels = [
     image: fuziIcon,
     name: "找福字",
   },
+  {
+    path: "/game/restaurant",
+    image: fuziIcon,
+    name: "开餐厅",
+  },
 ];
 
 const GamesCollect = () => {
   return (
     <>
       <Title>所有游戏</Title>
-      <Grid channels={channels} />;
+      <Grid channels={channels} />
     </>
   );
 };

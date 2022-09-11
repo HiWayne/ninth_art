@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import RestartButton from "./shared/components/RestartButton";
 import Icon from "shared/components/Icon";
-import failIcon from "assets/images/fail.jpg";
+import failIcon from "./assets/images/fail.jpg";
 import useStore from "@/store";
 import { useMemo, useRef } from "react";
 import { getFailText } from "./shared/utils/getFailText";

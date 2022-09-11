@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import AppRouter, { AppRoutes, routes } from "router/index";
 import { createGlobalStyle } from "styled-components";
+import Loading from "./shared/components/Loading";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -13,7 +15,9 @@ function App() {
     <>
       <GlobalStyle />
       <AppRouter>
-        <AppRoutes routes={routes}></AppRoutes>
+        <Suspense fallback={<Loading />}>
+          <AppRoutes routes={routes}></AppRoutes>
+        </Suspense>
       </AppRouter>
     </>
   );

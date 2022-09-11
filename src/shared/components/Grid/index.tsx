@@ -7,11 +7,12 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 12px;
 `;
 
 const Card = styled.div`
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
@@ -39,7 +40,7 @@ const Grid: FC<GridProps> = ({ channels }) => {
           style={{ textDecoration: "none" }}
         >
           <Card>
-            <DtIcon src={channel.image} width={100} height={100} />
+            <DtIcon src={channel.image} width={80} height={80} />
             <span>{channel.name}</span>
           </Card>
         </Link>

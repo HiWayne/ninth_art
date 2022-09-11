@@ -3,10 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1976d2" />
+    <!-- 指定桌面 icon -->
+    <link
+      rel="apple-touch-icon"
+      href="/static/img/apple-touch-icon-152x152.png"
+    />
+    <!-- 指定应用名称 -->
+    <meta name="apple-mobile-web-app-title" content="PWA Lesson" />
+    <!-- 是否隐藏 Safari 地址栏等-->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!--修改 iOS 状态栏颜色 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Ninth Art</title>
   </head>
   <body>
+    <!-- <script src="https://dt-static.s3.cn-east-2.jdcloud-oss.com/static/eruda.js"></script>
+    <script>
+      eruda.init();
+    </script> -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
