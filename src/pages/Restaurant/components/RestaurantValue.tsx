@@ -6,33 +6,66 @@ import safetyIcon from "../assets/images/icon/safety.png";
 import serviceLevelIcon from "../assets/images/icon/serviceLevel.png";
 import cookingIcon from "../assets/images/icon/cooking.png";
 import { Container } from "@inlet/react-pixi";
-import { FC } from "react";
+import { FC, useEffect } from "react";
+import { useForceUpdateOnDemand, useNewest } from "@/shared/hooks/index";
+import { createAnimate } from "@/shared/utils";
+import useStore from "@/store";
+import shallow from "zustand/shallow";
 
 interface RestaurantValueProps {
   x: number;
   y: number;
-  cash: number;
-  attractive: number;
-  impression: number;
-  safety: number;
-  serviceLevel: number;
-  cooking: number;
+  position: [number, number];
 }
 
 export const RestaurantValue: FC<RestaurantValueProps> = ({
   x,
   y,
-  cash = 0,
-  attractive = 0,
-  impression = 0,
-  safety = 0,
-  serviceLevel = 0,
-  cooking = 0,
+  position,
 }) => {
+  const [attractive, safety, serviceLevel, cooking, cash, impression] =
+    useStore(
+      (state) => [
+        state.restaurant.restaurant!.attractive,
+        state.restaurant.restaurant!.safety,
+        state.restaurant.restaurant!.serviceLevel,
+        state.restaurant.restaurant!.cooking,
+        state.restaurant.restaurant!.getCash(),
+        state.restaurant.restaurant!.getImpression(),
+      ],
+      shallow
+    );
+
+  const updater = useNewest(
+    useForceUpdateOnDemand([
+      cash,
+      attractive,
+      impression,
+      safety,
+      serviceLevel,
+      cooking,
+    ])
+  );
+
+  useEffect(() => {
+    const animate = createAnimate(() => {
+      updater();
+    });
+
+    const stop = animate();
+
+    return stop;
+  }, []);
+
   return (
-    <Container position={[x, y]}>
+    <Container
+      position={position}
+      rotation={Math.PI / 2}
+      x={window.innerWidth - 20}
+      y={(x / window.innerWidth) * window.innerHeight}
+    >
       <ValueColumn
-        x={10}
+        x={0}
         y={0}
         image={cashIcon}
         text="现金"
@@ -40,7 +73,7 @@ export const RestaurantValue: FC<RestaurantValueProps> = ({
         color={["#ffc802"]}
       />
       <ValueColumn
-        x={10}
+        x={0}
         y={25}
         image={attractiveIcon}
         text="吸引力"
@@ -48,7 +81,7 @@ export const RestaurantValue: FC<RestaurantValueProps> = ({
         color={["#ffb0ff"]}
       />
       <ValueColumn
-        x={10}
+        x={0}
         y={50}
         image={impressionIcon}
         text="餐厅形象"
@@ -56,7 +89,7 @@ export const RestaurantValue: FC<RestaurantValueProps> = ({
         color={["#f2a8a4"]}
       />
       <ValueColumn
-        x={10}
+        x={0}
         y={75}
         image={safetyIcon}
         text="安全度"
@@ -64,7 +97,7 @@ export const RestaurantValue: FC<RestaurantValueProps> = ({
         color={["#b9c4ca"]}
       />
       <ValueColumn
-        x={10}
+        x={0}
         y={100}
         image={serviceLevelIcon}
         text="服务水平"
@@ -72,7 +105,7 @@ export const RestaurantValue: FC<RestaurantValueProps> = ({
         color={["#c8c8cc"]}
       />
       <ValueColumn
-        x={10}
+        x={0}
         y={125}
         image={cookingIcon}
         text="菜品水平"

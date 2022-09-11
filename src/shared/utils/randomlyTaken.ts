@@ -1,5 +1,11 @@
 import { randomNumber } from "./randomNumber";
 
+/**
+ * @description 从一个集合里随机取指定的次数，不会重复取
+ * @param target 数组
+ * @param count 取的次数
+ * @returns { result: T[]; remaining: T[] }
+ */
 export const randomlyTaken = <T = any>(
   target: T[],
   count: number

@@ -1,5 +1,5 @@
 import { Fence } from "./Fence";
-import rightEnclosedFenceImage from "../../assets/images/furnish/right-fence.png";
+import rightEnclosedFenceImage from "../../assets/images/furnish/fence/right-fence.png";
 
 export const RightEnclosedFence = ({
   x,

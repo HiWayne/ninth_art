@@ -1,9 +1,25 @@
-import { RestaurantFence } from "./Fence/RestaurantFence";
+import { Container } from "@inlet/react-pixi";
 
-export const RestaurantContainer = () => {
+export const RestaurantContainer = ({
+  position,
+  children,
+  sortableChildren,
+}: {
+  position: [number, number];
+  children: JSX.Element | JSX.Element[];
+  sortableChildren: boolean;
+}) => {
   return (
-    <>
-      <RestaurantFence />
-    </>
+    <Container
+      width={window.innerHeight}
+      height={window.innerWidth}
+      position={position}
+      rotation={Math.PI / 2}
+      x={window.innerWidth}
+      y={0}
+      sortableChildren={sortableChildren}
+    >
+      {children}
+    </Container>
   );
 };

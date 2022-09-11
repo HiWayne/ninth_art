@@ -1,3 +1,4 @@
+import { FenceWidth } from "../constant";
 import { Position, StaffType } from "../types";
 import { createStabilityProperty } from "../utils";
 import {
@@ -10,7 +11,9 @@ import {
   Waiter,
 } from "./character";
 import { Enterprise } from "./Enterprise";
-import { Seat } from "./thing";
+import { Bank } from "./finance";
+import { Seat, Thing } from "./thing";
+import { FoodMaterial } from "./thing/FoodMaterial";
 import { kitchenUtensil } from "./thing/kitchenUtensil";
 import { Menu } from "./thing/Menu";
 
@@ -42,17 +45,24 @@ export class Restaurant extends Enterprise {
   diningAreaSize: number;
   // 厨房大小
   kitchenSize: number;
+  // 其他面积大小
+  otherSize: number;
+  decorations: Thing[];
   // 座位数
   seats: Seat[];
   // 每月租金
   rent: number;
   // 菜单：由厨师的技能决定
-  menus: Set<Menu>;
+  menus: Menu[];
+  // 菜品原材料
+  foodMaterials: FoodMaterial[];
   // 运转效率：百分比，影响资金收益。比如收入10000，效率80%，实际入账8000。
   efficiency: number;
   // 店内就餐顾客
   peopleDining: Customer[];
   kitchenUtensils: kitchenUtensil[];
+
+  bank: Bank;
 
   // 揽客员带来的吸引力
   _attractiveOfReceptionists: number;
@@ -70,7 +80,7 @@ export class Restaurant extends Enterprise {
   _impressionOfCleaners: number;
 
   constructor(
-    cash = 0,
+    cash = 100000,
     impression = 20,
     attractive = 15,
     safety = 10,
@@ -82,13 +92,17 @@ export class Restaurant extends Enterprise {
     cleaners = [],
     securityGuards = [],
     waitingQueue = [],
-    diningAreaSize = 4,
-    kitchenSize = 1,
-    kitchenUtensils = [new kitchenUtensil("cheap")],
-    seats = [new Seat("cheap"), new Seat("cheap")],
+    diningAreaSize = 42,
+    kitchenSize = 6,
+    kitchenUtensils = [new kitchenUtensil(0, 0, "cheap")],
+    seats = [
+      new Seat(FenceWidth * 3, FenceWidth * 5, "customized"),
+      new Seat(FenceWidth * 3, FenceWidth * 9, "customized"),
+    ],
     rent = 5000,
-    menus = new Set([]),
-    efficiency = 100
+    menus = [],
+    efficiency = 100,
+    decorations = []
   ) {
     super(cash, credibility);
     this.impression = impression;
@@ -103,13 +117,18 @@ export class Restaurant extends Enterprise {
     this.waitingQueue = waitingQueue;
     this.diningAreaSize = diningAreaSize;
     this.kitchenSize = kitchenSize;
+    this.otherSize = 0;
     this.kitchenUtensils = kitchenUtensils;
     this.seats = seats;
     this.rent = rent;
     this.menus = menus;
+    this.foodMaterials = [];
     this.efficiency = efficiency;
     this.peopleDining = [];
     this.cooking = this.computeCooking();
+    this.decorations = decorations;
+
+    this.bank = new Bank();
 
     this._attractiveOfReceptionists = 0;
     this._attractiveOfMenus = 0;
@@ -122,8 +141,11 @@ export class Restaurant extends Enterprise {
   }
   // 招募
   recruit(staff: Staff) {
-    if (staff.type === "cooker" && this.kitchenSize <= this.cookers.length) {
-      return new Error(`${this.kitchenSize}`);
+    if (
+      staff.type === "cooker" &&
+      this.kitchenSize / 4 <= this.cookers.length
+    ) {
+      return new Error(`${this.kitchenSize / 4}`);
     }
     const staffQueue = this._getStaffQueue(staff.type);
     staffQueue.push(staff);
@@ -311,7 +333,7 @@ export class Restaurant extends Enterprise {
   // 计算菜单吸引力
   computeAttractiveOfMenus() {
     const attractiveOfMenus = Math.round(
-      Array.from(this.menus).reduce(
+      this.menus.reduce(
         (attractive, menu) =>
           attractive + (0.3 * menu.difficulty + 0.7 * menu.rarity) / 10,
         0
@@ -383,7 +405,7 @@ export class Restaurant extends Enterprise {
           : cookingOfCookers,
       0
     );
-    const cookingOfMenus = Array.from(this.menus).reduce(
+    const cookingOfMenus = this.menus.reduce(
       (cookingOfMenus, menu) => cookingOfMenus + menu.rarity / 10,
       0
     );
@@ -397,12 +419,43 @@ export class Restaurant extends Enterprise {
       });
       return menus;
     }, new Set([] as Menu[]));
-    this.menus = menus;
+    this.menus = Array.from(menus);
+  }
+
+  addDecoration(decoration: Thing) {
+    this.decorations = [...this.decorations, decoration];
+  }
+  removeDecoration(decoration: Thing) {
+    const index = this.decorations.findIndex(
+      (_decoration) => _decoration === decoration
+    );
+    const decorations = [...this.decorations];
+    decorations.splice(index, 1);
+    this.decorations = decorations;
   }
 
   // 计算店面大小
   computeSize() {
-    return this.diningAreaSize + this.kitchenSize;
+    return (
+      this.diningAreaSize +
+      this.kitchenSize +
+      this.decorations.reduce((size, decoration) => size + decoration.size, 0)
+    );
+  }
+
+  buyFoodMaterials(foodMaterials: { name: string; number: number }[]) {}
+
+  computeFoodMaterialsNames() {
+    return Array.from(
+      new Set(
+        this.menus.reduce((foodMaterials, menu) => {
+          foodMaterials.push(
+            ...menu.foodMaterials.map((foodMaterial) => foodMaterial.name)
+          );
+          return foodMaterials;
+        }, [] as string[])
+      )
+    );
   }
 
   // 每月支付开支：员工工资、房租、维护成本、贷款
@@ -463,15 +516,28 @@ export class Restaurant extends Enterprise {
       0
     );
 
-    const staffSalary =
+    // 员工工资
+    const staffSalary = Math.round(
       cookersSalary +
-      waitersSalary +
-      receptionistsSalary +
-      cleanersSalary +
-      securityGuardsSalary;
+        waitersSalary +
+        receptionistsSalary +
+        cleanersSalary +
+        securityGuardsSalary
+    );
 
-    // 买菜成本
-    const groceryShoppingCost = this.menus;
+    // 买菜成本（按每个菜只准备1份计算）
+    const groceryShoppingCost = Math.round(
+      this.menus.reduce(
+        (cost, menu) =>
+          cost +
+          menu.foodMaterials.reduce(
+            (_cost, foodMaterial) =>
+              _cost + foodMaterial.dishCost * foodMaterial.price,
+            0
+          ),
+        0
+      )
+    );
 
     // 房租
     const rent = this.rent;
@@ -486,13 +552,39 @@ export class Restaurant extends Enterprise {
         maintenanceCost + kitchenUtensil.maintenanceCost,
       0
     );
-    const maintenanceCost =
-      maintenanceCostOfSeats + maintenanceCostOfKitchenUtensils;
+    // 总维护成本
+    const maintenanceCost = Math.round(
+      maintenanceCostOfSeats +
+        maintenanceCostOfKitchenUtensils +
+        this.decorations.reduce(
+          (cost, decoration) => cost + decoration.maintenanceCost,
+          0
+        )
+    );
+
+    // 贷款每期，含本金
+    const loans = Math.round(
+      this.bank.loans.reduce(
+        (money, loan) =>
+          money + (loan.value * (1 + loan.APR)) / loan.loanPeriod,
+        0
+      )
+    );
+
+    return {
+      staffSalary,
+      groceryShoppingCost,
+      rent,
+      maintenanceCost,
+      loans,
+      total: staffSalary + groceryShoppingCost + rent + maintenanceCost + loans,
+    };
   }
   // 计算餐厅可容纳人数
   computeCapacity() {
     return this.seats.reduce((capacity, seat) => capacity + seat.size, 0);
   }
+  // 返回任意空座
   hasAnyVacancies(): Seat | null {
     let vacancy = null;
     this.seats.some((seat) => {
