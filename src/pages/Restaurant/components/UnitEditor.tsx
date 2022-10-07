@@ -1,10 +1,10 @@
 import { useDrag } from "@/shared/hooks";
 import { Graphics, Sprite } from "@inlet/react-pixi";
 import type { Graphics as GraphicsType } from "pixi.js";
-import { FC, forwardRef, useCallback, useState } from "react";
+import { FC, forwardRef, useCallback, useRef, useState } from "react";
 import {
-  cancelIconWidth,
-  confirmIconWidth,
+  CancelIconWidth,
+  ConfirmIconWidth,
   DiningTableAndSeatsComposeDiningTableOffsetY,
   DiningTableAndSeatsComposeRightSeatOffsetX,
   DiningTableHeight,
@@ -18,7 +18,7 @@ import shallow from "zustand/shallow";
 
 const createDraw = () => (g: GraphicsType) => {
   g.clear();
-  g.beginFill(0x000000, 0.2);
+  g.beginFill(0x000000, 0.1);
   g.drawRect(
     0,
     0,
@@ -39,8 +39,8 @@ const Cancel: FC<OperateIconProps> = ({ x, y, onClick }) => (
   <Sprite
     x={x}
     y={y}
-    width={cancelIconWidth}
-    height={cancelIconWidth}
+    width={CancelIconWidth}
+    height={CancelIconWidth}
     image={cancelIcon}
     pointerdown={onClick}
     interactive={true}
@@ -51,8 +51,8 @@ const Confirm: FC<OperateIconProps> = ({ x, y, onClick }) => (
   <Sprite
     x={x}
     y={y}
-    width={confirmIconWidth}
-    height={confirmIconWidth}
+    width={ConfirmIconWidth}
+    height={ConfirmIconWidth}
     image={confirmIcon}
     pointerdown={onClick}
     interactive={true}
@@ -77,10 +77,10 @@ const Mask = forwardRef<
           x +
           (ToRightOrLeftSeatWidth +
             DiningTableAndSeatsComposeRightSeatOffsetX -
-            (cancelIconWidth + confirmIconWidth + 10)) /
+            (CancelIconWidth + ConfirmIconWidth + 10)) /
             2
         }
-        y={y - cancelIconWidth}
+        y={y - CancelIconWidth}
         onClick={handleCancel}
       />
       <Confirm
@@ -88,12 +88,12 @@ const Mask = forwardRef<
           x +
           (ToRightOrLeftSeatWidth +
             DiningTableAndSeatsComposeRightSeatOffsetX -
-            (cancelIconWidth + confirmIconWidth + 10)) /
+            (CancelIconWidth + ConfirmIconWidth + 10)) /
             2 +
-          cancelIconWidth +
+          CancelIconWidth +
           10
         }
-        y={y - confirmIconWidth}
+        y={y - ConfirmIconWidth}
         onClick={handleConfirm}
       />
     </>
@@ -120,6 +120,8 @@ export const UnitEditor: FC<UnitEditorProps> = ({
     shallow
   );
 
+  const prevPositionRef = useRef({ x: initialX, y: initialY });
+
   const [show, setShow] = useState(false);
   const { setPosition, binding: dragBind } = useDrag({
     x: initialX,
@@ -140,8 +142,8 @@ export const UnitEditor: FC<UnitEditorProps> = ({
   }, []);
 
   const resetPosition = useCallback(() => {
-    setPosition({ x: initialX, y: initialY });
-  }, [initialX, initialY]);
+    setPosition({ x: prevPositionRef.current.x, y: prevPositionRef.current.y });
+  }, []);
 
   const handleCancel = useCallback(() => {
     resetPosition();
@@ -149,11 +151,13 @@ export const UnitEditor: FC<UnitEditorProps> = ({
   }, [resetPosition, hideEditor]);
 
   const handleConfirm = useCallback(() => {
+    prevPositionRef.current.x = dragBind.position.x;
+    prevPositionRef.current.y = dragBind.position.y;
     if (typeof handleEntity === "function") {
       handleEntity({ x: dragBind.position.x, y: dragBind.position.y });
     }
     hideEditor();
-  }, [handleEntity, hideEditor]);
+  }, [handleEntity, hideEditor, dragBind.position.x, dragBind.position.y]);
 
   return canEdit ? (
     <>

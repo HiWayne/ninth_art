@@ -54,7 +54,7 @@ export class Staff<T = any> extends Physics {
     energy: number,
     stability: number,
     status: number,
-    rarity: number
+    rarity: 1 | 2 | 3 | 4 | 5
   ) {
     super(x, y)
     this.type = type;
