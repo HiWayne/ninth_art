@@ -4,7 +4,6 @@ import { FenceWidth } from "../constant";
 import { hasBar2 } from "./RestaurantFence";
 import { Floor } from "./Floor";
 import yellowWoodenFloorImage from "../assets/images/furnish/floor/yellow-wooden-floor.png";
-import grayFloorImage from "../assets/images/furnish/floor/gray-floor.png";
 import greenFloorImage from "../assets/images/furnish/floor/green-floor.png";
 import { Container } from "@inlet/react-pixi";
 import {
@@ -38,14 +37,6 @@ export const RestaurantFloor = () => {
     return width1 + width2 + 3 + (hasBar2(decorations) ? 6 : 0);
   }, [width1, width2, decorations]);
 
-  const kitchenRows = useMemo(() => {
-    return 6;
-  }, []);
-
-  const kitchenColumns = useMemo(() => {
-    return 8;
-  }, []);
-
   return (
     <Container position={position} sortableChildren={true}>
       {/* 顾客活动区域 */}
@@ -56,15 +47,6 @@ export const RestaurantFloor = () => {
         columns={diningAreaColumns}
         image={yellowWoodenFloorImage}
         zIndex={-9}
-      />
-      {/* 厨房区域 */}
-      <Floor
-        x={FenceWidth}
-        y={FenceWidth * (10 + height1 + height2 + height3)}
-        rows={kitchenRows}
-        columns={kitchenColumns}
-        image={grayFloorImage}
-        zIndex={-8}
       />
       {/* 门口区域 */}
       <Floor

@@ -2,7 +2,7 @@
 const baseRatio = 896 / 414;
 const ratio = window.innerHeight / window.innerWidth;
 const baseHeight = window.innerWidth * baseRatio;
-const baseFenceWidth = window.innerWidth * 0.042;
+const baseFenceWidth = window.innerWidth * 0.05;
 
 export const FenceWidth = Math.floor(
   ratio < baseRatio
@@ -18,5 +18,14 @@ export const DiningTableAndSeatsComposeRightSeatOffsetX = 56;
 export const DiningTableAndSeatsComposeDiningTableOffsetX = 15;
 export const DiningTableAndSeatsComposeDiningTableOffsetY = 8;
 
-export const cancelIconWidth = 20;
-export const confirmIconWidth = 20;
+export const CancelIconWidth = 20;
+export const ConfirmIconWidth = 20;
+
+export const KitchenUtensilWidth = FenceWidth * 0.984;
+export const KitchenUtensilHeight = FenceWidth * 1.6;
+export const VerticalWashbasinWidth = FenceWidth * 0.75;
+export const VerticalWashbasinHeight1 = FenceWidth * 1.72;
+export const VerticalWashbasinHeight2 = FenceWidth;
+
+export const CookerWidth = 32;
+export const CookerHeight = 50;

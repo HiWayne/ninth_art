@@ -1,5 +1,5 @@
 /**
- * @description 得到正态分布的值
+ * @description 得到正态分布的值，(60, 10) -> 均值60，68.26%的概率在50-70之间
  * @param mean 均值
  * @param std_dev 68.26%左右的标准差
  * @returns {number}
