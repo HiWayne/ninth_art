@@ -23,7 +23,7 @@ export const useDrag = ({ x, y } = { x: 0, y: 0 }) => {
   }, []);
   const onMove = useCallback(
     (e) => {
-      // e.stopPropagation();
+      e.stopPropagation();
       if (isDragging && sprite.current) {
         const currentPosition = e.data.getLocalPosition(sprite.current.parent);
         const offsetX = currentPosition.x - prevPosition.current.x;
