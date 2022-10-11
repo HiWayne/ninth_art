@@ -11,3 +11,4 @@ export * from "./RestaurantFloor";
 export * from "./furnish";
 export * from "./RestaurantTableAndSeats";
 export * from "./kitchen";
+export * from "./Menu";

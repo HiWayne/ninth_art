@@ -1,4 +1,4 @@
-import { Skill } from "../entity";
+import { Cooker, Skill, Staff } from "../entity";
 import { Property } from "../types";
 
 export const createProperty: <T = number>(
@@ -18,7 +18,7 @@ export const createAbilityProperty = createProperty(
   "工作能力",
   "影响员工各方面的表现"
 );
-export const createSkillsProperty = createProperty<Skill[]>(
+export const createSkillsProperty = createProperty<Skill<Staff | Cooker>[]>(
   "特殊技能",
   "随时间有几率获得工种相关的特殊技能，人物稀有度越高几率越大"
 );
