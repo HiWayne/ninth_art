@@ -1,11 +1,10 @@
 import { RouteType } from "./index";
 import Layout from "pages/Layout";
-import FuziGame from "@/pages/FuziGame/index";
-import Restaurant from "@/pages/Restaurant/index";
 import GamesCollect from "@/pages/GamesCollect";
 import { lazy } from "react";
 
-// const Restaurant = lazy(() => import("@/pages/Restaurant/index"));
+const FuziGame = lazy(() => import("@/pages/FuziGame/index"));
+const Restaurant = lazy(() => import("@/pages/Restaurant/index"));
 
 const gameRoutes: RouteType[] = [
   {

@@ -117,7 +117,7 @@ export class Customer extends Physics {
     }
     this.mood = Math.max(this.mood, 0);
     // 如果餐厅没有菜单，餐厅口碑-1
-    if (this.place.menus.size === 0) {
+    if (this.place.menus.length === 0) {
       this.place.changeImpression(this.place.getImpression() - 1);
       this.leave();
       return this.dishes;

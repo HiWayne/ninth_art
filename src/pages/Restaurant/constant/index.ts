@@ -1,4 +1,4 @@
-// iphone 12 pro, iphone xr
+// 以iphone 12 pro、iphone xr为基准
 const baseRatio = 896 / 414;
 const ratio = window.innerHeight / window.innerWidth;
 const baseHeight = window.innerWidth * baseRatio;
@@ -29,3 +29,7 @@ export const VerticalWashbasinHeight2 = FenceWidth;
 
 export const CookerWidth = 32;
 export const CookerHeight = 50;
+
+export * from "./cookerSkills";
+
+export * from "./menus";
