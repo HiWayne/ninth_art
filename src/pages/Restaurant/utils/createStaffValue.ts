@@ -1,18 +1,24 @@
 import { getNumberInNormalDistribution, randomNumber } from "@/shared/utils";
 
-export const createStaffValue = () => {
+export const createStaffValue = (): {
+  rarity: 1 | 2 | 3 | 4 | 5;
+  ability: number;
+  salary: number;
+  energy: number;
+  stability: number;
+} => {
   let ability;
   let salary;
-  let rarity;
+  let rarity: 1 | 2 | 3 | 4 | 5;
 
   const randomValue = Math.random();
 
-  // 5星概率0.5%、4星概率5%、3星概率50%、2星概率30%、1星概率14.5%
+  // 5星概率0.5%、4星概率5%、3星概率45%、2星概率35%、1星概率14.5%
   if (randomValue <= 0.005) {
     rarity = 5;
   } else if (randomValue <= 0.055) {
     rarity = 4;
-  } else if (randomValue <= 0.555) {
+  } else if (randomValue <= 0.505) {
     rarity = 3;
   } else if (randomValue <= 0.855) {
     rarity = 2;

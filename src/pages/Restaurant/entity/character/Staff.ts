@@ -9,15 +9,18 @@ import {
   createStatusProperty,
 } from "../../utils";
 import { Physics } from "../Physics";
+import { Cooker } from "./Cooker";
 import { Skill } from "./Skill";
 
-export class Staff<T = any> extends Physics {
+export class Staff extends Physics {
   // 薪水：每月工资
   salary: Property;
   // 工作能力：0-100，影响员工能力发挥
   ability: Property;
   // 掌握的特殊技能
   skills: Property<Skill[]>;
+  // 技能数量限制
+  skillLimit: number;
   // 精力：0-100，持续工作（加班）的能力
   energy: Property;
   // 当前体力
@@ -28,8 +31,12 @@ export class Staff<T = any> extends Physics {
   status: Property;
   // 员工稀有度：1-5
   rarity: Property;
-  // 岗位名称
+  // 人物名称
   name: string;
+  // 岗位名称
+  job: string;
+  // 性别：0-男，1-女
+  gender: 0 | 1;
   // 人物功能描述
   effectDesc: string;
   // 类别
@@ -46,19 +53,23 @@ export class Staff<T = any> extends Physics {
     x: number,
     y: number,
     type: StaffType,
+    gender: 0 | 1,
     name: string,
+    job: string,
     effectDesc: string,
     salary: number,
     ability: number,
-    skills: Skill<T>[],
+    skills: Skill<Staff | Cooker>[],
     energy: number,
     stability: number,
     status: number,
     rarity: 1 | 2 | 3 | 4 | 5
   ) {
-    super(x, y)
+    super(x, y);
     this.type = type;
+    this.gender = gender;
     this.name = name;
+    this.job = job;
     this.effectDesc = effectDesc;
     this.salary = createSalaryProperty(salary);
     this.ability = createAbilityProperty(ability);
@@ -72,6 +83,7 @@ export class Staff<T = any> extends Physics {
     this.workingYears = 0;
     this.arrearsOfWages = 0;
     this.payrollSuspension = false;
+    this.skillLimit = 3;
   }
   work() {
     this.status = createStatusProperty(1);
@@ -79,7 +91,7 @@ export class Staff<T = any> extends Physics {
   rest() {
     this.status = createStatusProperty(0);
   }
-  study(skill: Skill) {
+  studySkill(skill: Skill) {
     this.skills = createSkillsProperty([...this.skills.value, skill]);
   }
   changeStability(stability: number) {

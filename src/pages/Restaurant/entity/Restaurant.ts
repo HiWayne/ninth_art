@@ -29,6 +29,8 @@ export class Restaurant extends Enterprise {
   serviceLevel: number;
   // 厨艺：0-100，影响餐厅对顾客吸引力、顾客满意度、顾客消费金额
   cooking: number;
+  // 卫生：0-100，影响顾客满意度
+  health: number;
   // 服务员队伍
   waiters: Waiter[];
   // 厨师队伍
@@ -56,7 +58,9 @@ export class Restaurant extends Enterprise {
   menus: Menu[];
   // 菜品原材料
   foodMaterials: FoodMaterial[];
-  // 运转效率：百分比，影响资金收益。比如收入10000，效率80%，实际入账8000。
+  // 采购原材料折扣，1代表原价
+  discount: number;
+  // 运转效率：百分比，影响工作完成时间。比如厨师做饭时间10s，效率80%，实际时间12s。
   efficiency: number;
   // 店内就餐顾客
   peopleDining: Customer[];
@@ -85,6 +89,7 @@ export class Restaurant extends Enterprise {
     attractive = 15,
     safety = 10,
     serviceLevel = 10,
+    health = 60,
     credibility = 10,
     waiters = [],
     cookers = [],
@@ -109,6 +114,7 @@ export class Restaurant extends Enterprise {
     this.attractive = attractive;
     this.safety = safety;
     this.serviceLevel = serviceLevel;
+    this.health = health;
     this.waiters = waiters;
     this.cookers = cookers;
     this.receptionists = receptionists;
@@ -127,6 +133,7 @@ export class Restaurant extends Enterprise {
     this.peopleDining = [];
     this.cooking = this.computeCooking();
     this.decorations = decorations;
+    this.discount = 1;
 
     this.bank = new Bank();
 
@@ -200,6 +207,7 @@ export class Restaurant extends Enterprise {
         break;
       case "cleaner":
         this.computeImpressionOfCleaners();
+        this.computeHealthOfCleaners();
         break;
     }
   }
@@ -220,6 +228,7 @@ export class Restaurant extends Enterprise {
         break;
       case "cleaner":
         this.computeImpressionOfCleaners();
+        this.computeHealthOfCleaners();
         break;
     }
   }
@@ -388,7 +397,22 @@ export class Restaurant extends Enterprise {
       this.cleaners.reduce(
         (impression, cleaner) =>
           impression +
-          10 *
+          5 *
+            (cleaner.ability.value / 100) *
+            (20 / (20 + this.computeSize() + this.cleaners.length)),
+        0
+      )
+    );
+    this._impressionOfCleaners = impressionOfCleaners;
+  }
+  // 计算清洁员带来的餐厅卫生
+  computeHealthOfCleaners() {
+    // 清洁员的效果存在边际递减
+    const impressionOfCleaners = Math.round(
+      this.cleaners.reduce(
+        (health, cleaner) =>
+          health +
+          5 *
             (cleaner.ability.value / 100) *
             (20 / (20 + this.computeSize() + this.cleaners.length)),
         0
@@ -443,14 +467,28 @@ export class Restaurant extends Enterprise {
     );
   }
 
-  buyFoodMaterials(foodMaterials: { name: string; number: number }[]) {}
+  // 购买食材
+  buyFoodMaterials(foodMaterials: { price: number; number: number }[]) {
+    const money = foodMaterials.reduce(
+      (cost, foodMaterial) => cost + foodMaterial.price * foodMaterial.number,
+      0
+    );
+    if (this.getCash() >= money * this.discount) {
+      this.changeCash(this.getCash() - money * this.discount);
+    } else {
+      return new Error(`${money * this.discount}`);
+    }
+  }
 
+  // 计算所有菜谱所需食材
   computeFoodMaterialsNames() {
     return Array.from(
       new Set(
         this.menus.reduce((foodMaterials, menu) => {
           foodMaterials.push(
-            ...menu.foodMaterials.map((foodMaterial) => foodMaterial.name)
+            ...menu.foodMaterials.map(
+              (foodMaterial) => foodMaterial.foodMaterial.name
+            )
           );
           return foodMaterials;
         }, [] as string[])
@@ -532,7 +570,7 @@ export class Restaurant extends Enterprise {
           cost +
           menu.foodMaterials.reduce(
             (_cost, foodMaterial) =>
-              _cost + foodMaterial.dishCost * foodMaterial.price,
+              _cost + foodMaterial.cost * foodMaterial.foodMaterial.price,
             0
           ),
         0
