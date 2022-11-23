@@ -1,10 +1,12 @@
 import { Text } from "@inlet/react-pixi";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
-import { game } from "../index";
 import { themeColors } from "../assets/theme";
+import useStore from "@/store";
 
 export const GameTime = ({ x, y }: { x: number; y: number }) => {
+  const game = useStore((state) => state.restaurant.game);
+
   const [time, setTime] = useState(game.getCurrentTimeInGame());
 
   useEffect(() => {

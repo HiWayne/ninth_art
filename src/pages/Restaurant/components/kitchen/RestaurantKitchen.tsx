@@ -5,7 +5,7 @@ import {
   useMutableVerticalFenceCount,
   useRestaurantPosition,
 } from "../../hooks";
-import { Cooker } from "../character/Cooker";
+import { Cooker } from "../characters/Cooker";
 import { RestaurantKitchenFloor } from "./RestaurantKitchenFloor";
 import { RestaurantKitchenUtensils } from "./RestaurantKitchenUtensils";
 

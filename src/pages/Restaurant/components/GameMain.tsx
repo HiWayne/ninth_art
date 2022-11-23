@@ -4,7 +4,7 @@ import { RestaurantFloor } from "./RestaurantFloor";
 import { StreetContainer } from "./StreetContainer";
 import { RestaurantTableAndSeats } from "./RestaurantTableAndSeats";
 import { RestaurantKitchen } from "./kitchen/index";
-import { useRestaurantPosition } from "../hooks";
+import { Customers } from "./Customers";
 
 export const GameMain = () => {
   return (
@@ -15,7 +15,7 @@ export const GameMain = () => {
         <RestaurantTableAndSeats />
         <RestaurantKitchen />
       </RestaurantContainer>
-
+      <Customers />
       <StreetContainer></StreetContainer>
     </>
   );

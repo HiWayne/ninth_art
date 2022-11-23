@@ -8,6 +8,9 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
+  :root {
+    --pUV7hA: #0d1216;
+  }
 `;
 
 function App() {

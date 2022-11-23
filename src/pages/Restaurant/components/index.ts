@@ -12,3 +12,4 @@ export * from "./furnish";
 export * from "./RestaurantTableAndSeats";
 export * from "./kitchen";
 export * from "./Menu";
+export * from "./Modal";

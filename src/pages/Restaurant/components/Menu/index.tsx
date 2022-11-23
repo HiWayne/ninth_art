@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import leftArrowIcon from "../../assets/images/icon/leftArrow.svg";
+import { Entry } from "./components/Entry";
 
 const Wrapper = styled.div`
   position: fixed;
@@ -11,11 +12,11 @@ const Wrapper = styled.div`
   transform: translate(-50%, calc(100vw / 2 - 100px)) rotate(90deg);
   transform-origin: center;
   transition: all 0.2s ease-in;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto;
 `;
 
 const Content = styled.div`
+  padding: 8px;
   width: 100%;
   height: 100%;
   background-color: #f4d059;
@@ -43,15 +44,18 @@ export const Menu = () => {
   );
 
   const toggle = useCallback(() => {
+    console.log("toggle");
     setExpand((expand) => !expand);
   }, []);
 
   return (
     <Wrapper style={rightStyle}>
-      <Content />
+      <Content>
+        <Entry />
+      </Content>
       <LeftArrow onClick={toggle} />
     </Wrapper>
   );
 };
 
-// 营业、闭店、雇佣、人员管理（解雇、加薪、学习）、贷款、餐厅详细情况
+// 营业、闭店、雇佣、人员管理（解雇、加薪、学习）、贷款、餐厅详细情况、购买装修
