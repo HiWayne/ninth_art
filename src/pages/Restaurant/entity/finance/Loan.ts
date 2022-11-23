@@ -1,4 +1,4 @@
-import { game } from "../../index";
+import { game } from "@/store/restaurant";
 import { Enterprise } from "../Enterprise";
 
 export class Loan {

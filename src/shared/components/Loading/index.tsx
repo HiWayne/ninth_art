@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import loadingIcon from "assets/images/loading.svg";
 
-const Loading = styled.div`
+export const Loading = styled.div`
   position: fixed;
   left: 0;
   top: 0;

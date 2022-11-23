@@ -78,7 +78,7 @@ interface DtIconPropsType {
   className?: string;
 }
 
-const DtIcon: FunctionComponent<DtIconPropsType> = ({
+export const DtIcon: FunctionComponent<DtIconPropsType> = ({
   type,
   src,
   width = "100px",

@@ -30,7 +30,7 @@ interface GridProps {
   channels: Channel[];
 }
 
-const Grid: FC<GridProps> = ({ channels }) => {
+export const Grid: FC<GridProps> = ({ channels }) => {
   return (
     <Wrapper>
       {channels.map((channel, index) => (
