@@ -1,4 +1,4 @@
-import { game } from "../../index";
+import { game } from "@/store/restaurant";
 import { Enterprise } from "../Enterprise";
 import { Investment } from "./Investment";
 import { Loan } from "./Loan";

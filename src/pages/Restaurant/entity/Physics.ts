@@ -1,3 +1,5 @@
+import useStore from "@/store";
+
 export class Physics {
   private x: number;
   private y: number;
@@ -48,6 +50,7 @@ export class Physics {
       } else {
         resolve(true);
       }
+      useStore.getState().restaurant.update();
     });
   }
 }

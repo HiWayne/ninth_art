@@ -1,13 +1,52 @@
+import { game } from "@/store/restaurant";
 import { random } from "@/shared/utils/random";
 import { randomlyTaken } from "@/shared/utils/randomlyTaken";
 import { randomNumber } from "@/shared/utils/randomNumber";
-import { game } from "../../index";
 import { Restaurant } from "../index";
 import { Physics } from "../Physics";
 import { Seat } from "../thing";
 import { Menu } from "../thing/Menu";
 
+import character1eat1_001 from "../../assets/images/customer/character1/character1eat1_001.png";
+import character1eat1_002 from "../../assets/images/customer/character1/character1eat1_002.png";
+import character1eat1_003 from "../../assets/images/customer/character1/character1eat1_003.png";
+import character1eat1_004 from "../../assets/images/customer/character1/character1eat1_004.png";
+import character1eat1_005 from "../../assets/images/customer/character1/character1eat1_005.png";
+import character1eat1_006 from "../../assets/images/customer/character1/character1eat1_006.png";
+import character1eat3_001 from "../../assets/images/customer/character1/character1eat3_001.png";
+import character1eat3_002 from "../../assets/images/customer/character1/character1eat3_002.png";
+import character1eat3_003 from "../../assets/images/customer/character1/character1eat3_003.png";
+import character1eat3_004 from "../../assets/images/customer/character1/character1eat3_004.png";
+import character1eat3_005 from "../../assets/images/customer/character1/character1eat3_005.png";
+import character1eat3_006 from "../../assets/images/customer/character1/character1eat3_006.png";
+import character1stay1_001 from "../../assets/images/customer/character1/character1stay1_001.png";
+import character1stay3_001 from "../../assets/images/customer/character1/character1stay3_001.png";
+import character1walk1_001 from "../../assets/images/customer/character1/character1walk1_001.png";
+import character1walk1_002 from "../../assets/images/customer/character1/character1walk1_002.png";
+import character1walk1_003 from "../../assets/images/customer/character1/character1walk1_003.png";
+import character1walk3_001 from "../../assets/images/customer/character1/character1walk3_001.png";
+import character1walk3_002 from "../../assets/images/customer/character1/character1walk3_002.png";
+import character1walk3_003 from "../../assets/images/customer/character1/character1walk3_003.png";
+
+const createUI = () => ({
+  1: {
+    eat: {
+      1: [character1eat1_001, character1eat1_002, character1eat1_003],
+      3: [character1eat3_001, character1eat3_002, character1eat3_003],
+    },
+    stay: {
+      1: [character1stay1_001],
+      3: [character1stay3_001],
+    },
+    walk: {
+      1: [character1walk1_001, character1walk1_002, character1walk1_003],
+      3: [character1walk3_001, character1walk3_002, character1walk3_003],
+    },
+  },
+});
+
 export class Customer extends Physics {
+  id: number;
   // 消费能力：0-100
   consumptionLevel: number;
   // 要求：0-100，心情指数>=要求视为满意，满意度越高小费越高
@@ -24,9 +63,19 @@ export class Customer extends Physics {
   seat: Seat | null;
   // 点的菜
   dishes: Menu[];
-  // 状态：0-未进店、1-排队、2-进店、3-点餐、4-等餐、5-用餐、6-结束、7-不进店
+  // 状态：0-街道行走、1-排队、2-进店、3-点餐、4-等餐、5-用餐、6-结束、7-不进店
   status: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  // 此刻顾客图片
+  ui: string;
+  static uis: {
+    1: {
+      eat: { 1: string[]; 3: string[] };
+      walk: { 1: string[]; 3: string[] };
+      stay: { 1: string[]; 3: string[] };
+    };
+  };
   constructor(
+    id: number,
     x: number,
     y: number,
     consumptionLevel: number,
@@ -34,6 +83,7 @@ export class Customer extends Physics {
     place: Restaurant
   ) {
     super(x, y);
+    this.id = id;
     this.consumptionLevel = consumptionLevel;
     this.requirement = Math.round(
       consumptionLevel * (1 + randomNumber(-2, 2) / 10)
@@ -45,6 +95,7 @@ export class Customer extends Physics {
     this.seat = null;
     this.dishes = [];
     this.status = 0;
+    this.ui = Customer.uis[1].walk[1][0];
   }
   // 进店或排队
   intoStore() {
@@ -248,7 +299,7 @@ export class Customer extends Physics {
   async walkLeave() {}
   walkToSeat(x: number, y: number) {}
   async walkFromSeatToGate(x: number, y: number) {}
-  play() {
+  walk() {
     switch (this.status) {
       case 0:
         this.walkToGate(Restaurant.gate.x, this.getY()).then(() => {
@@ -285,3 +336,5 @@ export class Customer extends Physics {
     game.clearFromCustomers(this);
   }
 }
+
+Customer.uis = createUI();

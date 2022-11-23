@@ -16,6 +16,8 @@ export class Game {
   private customers: Customer[];
   private timeRecorder: number;
   private customerTimer: number;
+  // 全局自增id
+  private nextId: number;
 
   constructor() {
     this.currentTimeInGame = new Date().getTime();
@@ -26,9 +28,17 @@ export class Game {
     this.customers = [];
     this.timeRecorder = null as any;
     this.customerTimer = null as any;
+    this.nextId = 0;
+  }
+  getNextId() {
+    this.nextId++;
+    return this.nextId;
   }
   getRestaurant() {
     return this.restaurant;
+  }
+  getCustomers() {
+    return this.customers;
   }
   setUpdater(updater: DispatchWithoutAction) {
     this.updater = updater;
@@ -58,7 +68,9 @@ export class Game {
   }
   play() {
     this.status = 1;
+    // 时间
     this._recordTime();
+    // 产生顾客
     this._startCreateCustomer();
   }
   _recordTime() {
@@ -66,9 +78,11 @@ export class Game {
   }
   pause() {
     this.status = 2;
+    clearInterval(this.customerTimer);
   }
   stop() {
     this.status = 3;
+    clearInterval(this.customerTimer);
   }
   init() {
     this.status = 0;
@@ -78,20 +92,30 @@ export class Game {
     return this.status === 1;
   }
   _startCreateCustomer() {
-    this.customerTimer = setInterval(() => {
-      if (this._isPlaying()) {
-        const customer = new Customer(
-          0,
-          randomNumber(0, 30),
-          getNumberInNormalDistribution(60, 10),
-          getNumberInNormalDistribution(60, 20),
-          this.restaurant
-        );
-        this.customers.push(customer);
-      } else {
-        clearInterval(this.customerTimer);
-      }
-    }, 1000);
+    const timeout = () => {
+      setTimeout(() => {
+        if (this._isPlaying()) {
+          const customer = new Customer(
+            this.getNextId(),
+            0,
+            randomNumber(0, 30),
+            getNumberInNormalDistribution(60, 10),
+            getNumberInNormalDistribution(60, 20),
+            this.restaurant
+          );
+          this.customers = [...this.customers, customer];
+          this.updateUI();
+          timeout();
+        } else {
+          return;
+        }
+      }, this._getIntervalOfHumanTraffic());
+    };
+    timeout();
+  }
+  // 代表客流量的时间间隔
+  _getIntervalOfHumanTraffic() {
+    return randomNumber(20, 100) * 100;
   }
   clearFromCustomers(customer: Customer) {
     const index = this.customers.findIndex(
