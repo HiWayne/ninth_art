@@ -167,6 +167,7 @@ export const UnitEditor: FC<UnitEditorProps> = ({
         onClick={showEditor}
       />
       {show ? (
+        //@ts-ignore
         <Mask
           x={dragBind.position.x}
           y={dragBind.position.y}

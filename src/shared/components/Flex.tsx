@@ -1,4 +1,4 @@
-import { FC, ReactElement } from "react";
+import { FC, MouseEventHandler, ReactElement } from "react";
 import styled from "styled-components";
 
 interface FlexProps {
@@ -20,12 +20,23 @@ interface FlexProps {
     | "space-around"
     | "space-between";
   children: ReactElement | ReactElement[];
+  onClick?: MouseEventHandler;
 }
 
 export const Flex = styled<FC<FlexProps>>(
-  ({ className, style, inline, direction, wrap, justify, align, children }) => {
+  ({
+    className,
+    style,
+    inline,
+    direction,
+    wrap,
+    justify,
+    align,
+    children,
+    onClick,
+  }) => {
     return (
-      <div className={className} style={style}>
+      <div className={className} style={style} onClick={onClick}>
         {children}
       </div>
     );

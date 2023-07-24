@@ -21,6 +21,7 @@
     "@pixi/settings": "6.5.1",
     "@pixi/ticker": "^6.5.1",
     "@pixi/utils": "6.5.1",
+    "antd-mobile": "^5.32.0",
     "dayjs": "^1.11.5",
     "immer": "^9.0.15",
     "pixi-viewport": "^4.35.0",

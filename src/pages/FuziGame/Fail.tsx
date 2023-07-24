@@ -20,17 +20,17 @@ const TextWrapper = styled.div`
 
 const Content = styled(({ className }) => {
   const speededTime = useStore((state) => state.fuzi.speededTime);
-  const totalCount = useStore((state) => state.fuzi.totalCount);
+  const totalNeedFinding = useStore((state) => state.fuzi.totalNeedFinding);
   const countNoFind = useStore((state) => state.fuzi.countNoFind);
 
   const findCount = useMemo(
-    () => totalCount - countNoFind,
-    [totalCount, countNoFind]
+    () => totalNeedFinding - countNoFind,
+    [totalNeedFinding, countNoFind]
   );
 
   const failText = useMemo(
-    () => getFailText(findCount, totalCount, speededTime),
-    [findCount, totalCount, speededTime]
+    () => getFailText(findCount, totalNeedFinding, speededTime),
+    [findCount, totalNeedFinding, speededTime]
   );
 
   return (
@@ -75,7 +75,7 @@ const Fail = styled(({ className }) => {
   return (
     <div className={className} ref={container}>
       <Content />
-      <RestartButton>再来一次</RestartButton>
+      <RestartButton>确定</RestartButton>
     </div>
   );
 })`

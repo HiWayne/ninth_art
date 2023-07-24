@@ -16,7 +16,7 @@ export const GameMain = () => {
         <RestaurantKitchen />
       </RestaurantContainer>
       <Customers />
-      <StreetContainer></StreetContainer>
+      {/* <StreetContainer></StreetContainer> */}
     </>
   );
 };
