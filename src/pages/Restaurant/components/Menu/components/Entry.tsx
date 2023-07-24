@@ -77,7 +77,10 @@ export const Entry = () => {
     "overview" | "staff" | "funding" | "furnish" | ""
   >("");
 
-  const Page = useMemo(() => DetailMap[pageType], [pageType]);
+  const Page: () => JSX.Element = useMemo(
+    () => DetailMap[pageType] as any,
+    [pageType]
+  );
 
   const efficiency = useStore(
     (state) => (state.restaurant.restaurant as Restaurant).efficiency
@@ -108,7 +111,7 @@ export const Entry = () => {
     () => [
       {
         name: "餐厅详情",
-        onClick: () => {
+        onClick: (): void => {
           setPageType("overview");
         },
       },
@@ -118,7 +121,7 @@ export const Entry = () => {
           { name: "服务员人数", value: waiters.length },
           { name: "厨师人数", value: cookers.length },
         ],
-        onClick: () => {
+        onClick: (): void => {
           setPageType("staff");
         },
       },
@@ -145,7 +148,7 @@ export const Entry = () => {
             tip: "餐厅贷款本金：从银行贷款的金额（不包含已还的）",
           },
         ],
-        onClick: () => {
+        onClick: (): void => {
           setPageType("funding");
         },
       },

@@ -4,7 +4,7 @@ import useStore from "@/store";
 import { useCallback } from "react";
 import shallow from "zustand/shallow";
 import { Fuzi, GameResultEnum } from "../types";
-import { TOTAL_TIME } from "../../config";
+import { TIME_LIMIT } from "@/store/fuzi";
 
 const RestartButton = styled(({ ...props }) => {
   const [
@@ -36,8 +36,11 @@ const RestartButton = styled(({ ...props }) => {
   );
 
   const restart = useCallback(() => {
+    const timeLimit =
+      new URLSearchParams(window.location.search).get(TIME_LIMIT) || "10";
+
     setFuziCards([]);
-    setRemainingTime(TOTAL_TIME);
+    setRemainingTime(parseFloat(timeLimit) * 1000);
     setGameResult(0);
     setCountNoFind(0);
     setOvertime(0);

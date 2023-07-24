@@ -16,8 +16,12 @@ const Notification = styled<FC<NotificationProps>>(
   }
 )`
   position: fixed;
-  top: 50px;
-  width: 100%;
+  top: 80px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  padding: 8px 12px;
+  width: fit-content;
   text-align: center;
   animation: ShowAndHide 1.5s ease-out;
   color: ${(props) =>
@@ -26,11 +30,13 @@ const Notification = styled<FC<NotificationProps>>(
       : props.type === "bad"
       ? "#909399"
       : "inherit"};
+  background: #fff;
   opacity: 0;
-  transform: translateY(20px);
   z-index: 10;
   font-size: 14px;
   font-weight: bolder;
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 
   @keyframes ShowAndHide {
     0% {

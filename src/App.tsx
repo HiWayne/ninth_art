@@ -11,6 +11,13 @@ const GlobalStyle = createGlobalStyle`
   :root {
     --pUV7hA: #0d1216;
   }
+  @keyframes shaking {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(0eg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+  }
 `;
 
 function App() {

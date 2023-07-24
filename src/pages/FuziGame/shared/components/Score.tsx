@@ -15,7 +15,7 @@ const Score = styled(({ className }) => {
   );
   const timePenalty = useStore((state) => state.fuzi.timePenalty);
   const findCount = useStore(
-    (state) => state.fuzi.totalCount - state.fuzi.countNoFind
+    (state) => state.fuzi.totalNeedFinding - state.fuzi.countNoFind
   );
 
   const [isBest, setIsBest] = useState(false);

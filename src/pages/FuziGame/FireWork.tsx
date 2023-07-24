@@ -69,7 +69,7 @@ const FireWorksCanvas = styled(({ className }) => {
         className={className}
       />
       <Score />
-      {showRestart ? <RestartButton>再来一次</RestartButton> : null}
+      {showRestart ? <RestartButton>确定</RestartButton> : null}
     </div>
   );
 })`

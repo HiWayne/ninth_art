@@ -42,11 +42,11 @@ const StaffItem = styled(({ className, data }) => {
         <Avatar src={data.avatar} />
         <HeadInfo data={data} />
       </Flex>
-      <Flex direction="column" align="flex-start"></Flex>
+      {/* <Flex direction="column" align="flex-start"></Flex> */}
     </Flex>
   );
 });
 
-export const StaffList = ({ list }) => {
+export const StaffList = ({ list }: { list: any }) => {
   return null;
 };
