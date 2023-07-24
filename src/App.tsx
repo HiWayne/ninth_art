@@ -13,9 +13,9 @@ const GlobalStyle = createGlobalStyle`
   }
   @keyframes shaking {
     0% { transform: rotate(0deg); }
-    25% { transform: rotate(5deg); }
+    25% { transform: rotate(3deg); }
     50% { transform: rotate(0eg); }
-    75% { transform: rotate(-5deg); }
+    75% { transform: rotate(-3deg); }
     100% { transform: rotate(0deg); }
   }
 `;

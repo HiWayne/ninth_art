@@ -7,7 +7,7 @@ import gameIcon from "assets/images/game.svg";
 const channels = [
   {
     image: gameIcon,
-    name: "小游戏",
+    name: "选择游戏",
     path: "/game",
   },
 ];

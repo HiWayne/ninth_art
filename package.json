@@ -23,6 +23,7 @@
     "@pixi/utils": "6.5.1",
     "antd-mobile": "^5.32.0",
     "dayjs": "^1.11.5",
+    "fireworks-js": "^2.10.7",
     "immer": "^9.0.15",
     "pixi-viewport": "^4.35.0",
     "pixi.js": "^6.5.1",

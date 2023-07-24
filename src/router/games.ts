@@ -4,7 +4,8 @@ import GamesCollect from "@/pages/GamesCollect";
 import { lazy } from "react";
 
 const FuziGame = lazy(() => import("@/pages/FuziGame/index"));
-const Restaurant = lazy(() => import("@/pages/Restaurant/index"));
+const ZhaoBuTong = lazy(() => import("@/pages/ZhaoBuTong/index"));
+// const Restaurant = lazy(() => import("@/pages/Restaurant/index"));
 
 const gameRoutes: RouteType[] = [
   {
@@ -21,9 +22,13 @@ const gameRoutes: RouteType[] = [
         element: FuziGame,
       },
       {
-        path: "restaurant",
-        element: Restaurant,
+        path: "zhaobutong",
+        element: ZhaoBuTong,
       },
+      // {
+      //   path: "restaurant",
+      //   element: Restaurant,
+      // },
     ],
   },
 ];
