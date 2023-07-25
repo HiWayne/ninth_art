@@ -4,15 +4,17 @@ import styled from "styled-components";
 import DtIcon from "../Icon";
 
 const Wrapper = styled.div`
+  margin-left: -24px;
+  margin-top: -24px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
 `;
 
 const Card = styled.div`
+  margin-left: 24px;
+  margin-top: 24px;
   width: 80px;
-  height: 80px;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
@@ -40,8 +42,17 @@ export const Grid: FC<GridProps> = ({ channels }) => {
           style={{ textDecoration: "none" }}
         >
           <Card>
-            <DtIcon src={channel.image} width={80} height={80} />
-            <span>{channel.name}</span>
+            <DtIcon
+              src={channel.image}
+              width={80}
+              height={80}
+              style={{ borderRadius: "12px", overflow: "hidden" }}
+            />
+            <span
+              style={{ marginTop: "4px", color: "#333", fontWeight: "bold" }}
+            >
+              {channel.name}
+            </span>
           </Card>
         </Link>
       ))}
