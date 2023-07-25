@@ -170,6 +170,8 @@ const ZhaoBuTong = () => {
   const [gameProps, setGameProps] = useState(parseInt(savedProps));
   // 本关使用了道具
   const [usedProp, setUsedProp] = useState(false);
+  // 本关获得了道具
+  const [gotProp, setGotProp] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [clickedPosition, setClickedPosition] = useState<Answers | null>(null);
@@ -179,21 +181,32 @@ const ZhaoBuTong = () => {
   const currentLevelStartTimeRef = useRef(Date.now());
 
   const answers = useMemo<Answers>(() => {
-    const row = randomNumber(0, 10);
-    const column = randomNumber(0, 10);
+    const row = randomNumber(0, ROW_COUNT - 1);
+    const column = randomNumber(0, COLUMN_COUNT - 1);
     return {
       row,
       column,
     };
   }, [currentChars]);
 
-  const restartLevel = useCallback(() => {}, []);
+  // 重玩本关
+  const restartLevel = useCallback(() => {
+    setSuccess(false);
+    setError(false);
+    setClickedPosition(null);
+    setGotProp(false);
+    setSuccessPopVisibility(false);
+    setRemainingTime(currentTotalGameTime);
+    currentLevelStartTimeRef.current = Date.now();
+  }, [currentTotalGameTime]);
 
+  // 下一关
   const goNextLevel = useCallback(() => {
     if (currentLevel < charList.length - 1) {
       setSuccess(false);
       setError(false);
       setClickedPosition(null);
+      setGotProp(false);
       // 下一关时间在本关剩余时间基础上增加30~60秒
       const extractTime = randomNumber(30000, 60000);
       const nextLevelTime = remainingTime + extractTime;
@@ -229,6 +242,7 @@ const ZhaoBuTong = () => {
         return;
       }
       setClickedPosition(receivedAnswers);
+      // 答对
       if (
         receivedAnswers.row === answers.row &&
         receivedAnswers.column === answers.column
@@ -239,6 +253,7 @@ const ZhaoBuTong = () => {
         // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具
         if (!usedProp && speedTime <= 10000) {
           setGameProps((props) => props + 1);
+          setGotProp(true);
           window.localStorage.setItem(SAVED_PROPS, `${gameProps + 1}`);
         }
         let score: number;
@@ -270,6 +285,7 @@ const ZhaoBuTong = () => {
         // 罚时
         setRemainingTime((time) => (time - 2000 < 0 ? 0 : time - 2000));
         setDecreaseTime(2000);
+        currentLevelStartTimeRef.current -= 2000;
         setTimeout(() => {
           setShaking(false);
           setError(false);
@@ -296,21 +312,25 @@ const ZhaoBuTong = () => {
         } else if (offset === -1) {
           if (answers.column > 1) {
             helpRange = [
-              answers.column - 2,
-              answers.column - 1,
-              answers.column,
-            ];
-          } else {
-            helpRange = [
               answers.column - 1,
               answers.column,
               answers.column + 1,
             ];
+          } else {
+            helpRange = [
+              answers.column,
+              answers.column + 1,
+              answers.column + 2,
+            ];
           }
         } else if (offset === 0) {
-          helpRange = [answers.column - 1, answers.column, answers.column + 1];
-        } else {
           helpRange = [answers.column, answers.column + 1, answers.column + 2];
+        } else {
+          helpRange = [
+            answers.column + 1,
+            answers.column + 2,
+            answers.column + 3,
+          ];
         }
       } else {
         if (answers.row === 0) {
@@ -319,14 +339,14 @@ const ZhaoBuTong = () => {
           helpRange = [COLUMN_COUNT - 2, COLUMN_COUNT - 1, COLUMN_COUNT];
         } else if (offset === -1) {
           if (answers.row > 1) {
-            helpRange = [answers.row - 2, answers.row - 1, answers.row];
-          } else {
             helpRange = [answers.row - 1, answers.row, answers.row + 1];
+          } else {
+            helpRange = [answers.row, answers.row + 1, answers.row + 2];
           }
         } else if (offset === 0) {
-          helpRange = [answers.row - 1, answers.row, answers.row + 1];
-        } else {
           helpRange = [answers.row, answers.row + 1, answers.row + 2];
+        } else {
+          helpRange = [answers.row + 1, answers.row + 2, answers.row + 3];
         }
       }
       setInfoText(
@@ -447,6 +467,7 @@ const ZhaoBuTong = () => {
         visibility={successPopVisibility}
         onNext={goNextLevel}
         onRestart={restartLevel}
+        gotProp={gotProp}
       />
       <FailPop visibility={failPopVisibility} onClick={restartLevel} />
       <InfoPop
