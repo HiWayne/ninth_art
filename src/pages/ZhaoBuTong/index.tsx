@@ -37,7 +37,7 @@ interface Answers {
 
 const Wrapper = styled.div`
   width: 100vw;
-  height: 100vh;
+  height: -webkit-fill-available;
   background: linear-gradient(to right, #e1d998 0px, #e3dfb2 50%, #e1d998 100%);
 `;
 
@@ -113,6 +113,7 @@ let savedLevelsScore: Record<
     speedTime: number | null;
     minSpeedTime: number | null;
     recordDate: number | null;
+    gotProp: boolean;
   }
 >;
 try {
@@ -128,6 +129,7 @@ try {
       speedTime: null,
       minSpeedTime: null,
       recordDate: null,
+      gotProp: false,
     },
   };
 }
@@ -171,7 +173,9 @@ const ZhaoBuTong = () => {
   // 本关使用了道具
   const [usedProp, setUsedProp] = useState(false);
   // 本关获得了道具
-  const [gotProp, setGotProp] = useState(false);
+  const [gotProp, setGotProp] = useState(
+    savedLevelsScore[currentLevel].gotProp
+  );
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [clickedPosition, setClickedPosition] = useState<Answers | null>(null);
@@ -189,24 +193,28 @@ const ZhaoBuTong = () => {
     };
   }, [currentChars]);
 
-  // 重玩本关
-  const restartLevel = useCallback(() => {
+  // 重置关卡的通用信息
+  const resetLevel = useCallback(() => {
     setSuccess(false);
     setError(false);
     setClickedPosition(null);
-    setGotProp(false);
+    setGotProp(savedLevelsScore[currentLevel].gotProp);
     setSuccessPopVisibility(false);
-    setRemainingTime(currentTotalGameTime);
+    setFailPopVisibility(false);
+    setInfoPopVisibility(false);
     currentLevelStartTimeRef.current = Date.now();
-  }, [currentTotalGameTime]);
+  }, [currentLevel]);
+
+  // 重玩本关
+  const restartLevel = useCallback(() => {
+    resetLevel();
+    setRemainingTime(currentTotalGameTime);
+  }, [resetLevel]);
 
   // 下一关
   const goNextLevel = useCallback(() => {
     if (currentLevel < charList.length - 1) {
-      setSuccess(false);
-      setError(false);
-      setClickedPosition(null);
-      setGotProp(false);
+      resetLevel();
       // 下一关时间在本关剩余时间基础上增加30~60秒
       const extractTime = randomNumber(30000, 60000);
       const nextLevelTime = remainingTime + extractTime;
@@ -218,23 +226,22 @@ const ZhaoBuTong = () => {
         speedTime: null,
         minSpeedTime: null,
         recordDate: null,
+        gotProp: false,
       };
       window.localStorage.setItem(
         SAVED_LEVELS_SCORE,
         JSON.stringify(savedLevelsScore)
       );
-      setSuccessPopVisibility(false);
       setCurrentLevel(currentLevel + 1);
       setCurrentChar(charList[currentLevel + 1]);
       setAddTime(extractTime);
       setRemainingTime(nextLevelTime);
       setCurrentTotalGameTime(nextLevelTime);
-      currentLevelStartTimeRef.current = Date.now();
       setTimeout(() => {
         setAddTime(0);
       }, 1000);
     }
-  }, [currentLevel, remainingTime]);
+  }, [currentLevel, remainingTime, resetLevel]);
 
   const handleClickChar = useCallback(
     (receivedAnswers: Answers) => {
@@ -247,11 +254,11 @@ const ZhaoBuTong = () => {
         receivedAnswers.row === answers.row &&
         receivedAnswers.column === answers.column
       ) {
-        clearInterval(timerRef.current!);
+        clearTimeout(timerRef.current!);
         setSuccess(true);
         const speedTime = Date.now() - currentLevelStartTimeRef.current;
-        // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具
-        if (!usedProp && speedTime <= 10000) {
+        // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具。本关已获得过道具除外
+        if (!gotProp && !usedProp && speedTime <= 10000) {
           setGameProps((props) => props + 1);
           setGotProp(true);
           window.localStorage.setItem(SAVED_PROPS, `${gameProps + 1}`);
@@ -263,6 +270,17 @@ const ZhaoBuTong = () => {
           score = 2;
         } else {
           score = 1;
+        }
+        if (!savedLevelsScore[currentLevel]) {
+          savedLevelsScore[currentLevel] = {
+            level: currentLevel,
+            score: null,
+            remainingTime: currentTotalGameTime,
+            speedTime: null,
+            minSpeedTime: null,
+            recordDate: null,
+            gotProp,
+          };
         }
         savedLevelsScore[currentLevel].score = score;
         savedLevelsScore[currentLevel].speedTime = speedTime;
@@ -364,17 +382,21 @@ const ZhaoBuTong = () => {
   }, []);
 
   useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setRemainingTime((time) => (time - 1000 < 0 ? 0 : time - 1000));
-    }, 1000);
+    if (infoPopVisibility) {
+      clearTimeout(timerRef.current!);
+    } else {
+      timerRef.current = setTimeout(() => {
+        setRemainingTime((time) => (time - 1000 < 0 ? 0 : time - 1000));
+      }, 1000);
+    }
     if (remainingTime <= 0) {
-      clearInterval(timerRef.current);
+      clearTimeout(timerRef.current!);
       if (!failPopVisibility) {
         setFailPopVisibility(true);
       }
     }
-    return () => clearInterval(timerRef.current!);
-  }, [currentChars, remainingTime]);
+    return () => clearTimeout(timerRef.current!);
+  }, [currentChars, remainingTime, infoPopVisibility]);
 
   return (
     <Wrapper>
@@ -415,7 +437,7 @@ const ZhaoBuTong = () => {
         </Flex>
         <Flex justify="center" align="center" style={{ width: "100%" }}>
           <LevelInfo>
-            <CurrentChar>找到：{currentChars[0]}</CurrentChar>
+            <CurrentChar>找到：{currentChars[currentLevel]}</CurrentChar>
             <LevelText>第{currentLevel + 1}关</LevelText>
             <Stars
               counts={3}

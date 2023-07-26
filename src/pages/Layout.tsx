@@ -2,9 +2,9 @@ import { FC } from "react";
 import { Outlet } from "react-router-dom";
 
 const Layout: FC = () => (
-  <div>
+  <div className="h-[100%]">
     <nav></nav>
-    <main>
+    <main className="h-[100%]">
       <Outlet />
     </main>
   </div>
