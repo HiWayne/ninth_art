@@ -4,9 +4,13 @@ import levelOpenBgIcon from "../../assets/images/levels/level_open.png";
 import levelCloseBgIcon from "../../assets/images/levels/level_close.png";
 import starActiveIcon from "../../assets/images/levels/star_active.png";
 import starInActiveIcon from "../../assets/images/levels/star_inactive.png";
-import gamePropIcon from "../../assets/images/game_prop@200.gif";
-import { SAVED_LEVEL, SAVED_LEVELS_SCORE } from "@/store/zhaoBuTong";
-import { REMAINING_TIME } from "../../Game";
+import gamePropStaticIcon from "../../assets/images/game_prop_static.png";
+import {
+  REMAINING_TIME,
+  SAVED_LEVEL,
+  SAVED_LEVELS_SCORE,
+  savedLevelsScoreRef,
+} from "@/store/zhaoBuTong";
 import useStore from "@/store";
 
 const TOTAL_STARS = 3;
@@ -32,25 +36,18 @@ export const Level: FC<{
           if (locked) {
             return;
           }
-          try {
-            const savedLevelsScore = JSON.parse(
-              window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
+          // 从关卡选择列表进入时重置初始时间
+          if (
+            savedLevelsScoreRef.current[level] &&
+            savedLevelsScoreRef.current[level].remainingTime !== REMAINING_TIME
+          ) {
+            savedLevelsScoreRef.current[level].remainingTime = REMAINING_TIME;
+            window.localStorage.setItem(
+              SAVED_LEVELS_SCORE,
+              JSON.stringify(savedLevelsScoreRef.current)
             );
-            // 从关卡选择列表进入时重置初始时间
-            if (
-              savedLevelsScore[level] &&
-              savedLevelsScore[level].remainingTime !== REMAINING_TIME
-            ) {
-              savedLevelsScore[level].remainingTime = REMAINING_TIME;
-              window.localStorage.setItem(
-                SAVED_LEVELS_SCORE,
-                JSON.stringify(savedLevelsScore)
-              );
-              useStore.getState().zhaoBuTong.setCurrentLevel(level);
-            }
-          } catch {
-            void 0;
           }
+          useStore.getState().zhaoBuTong.setCurrentLevel(level);
           window.localStorage.setItem(SAVED_LEVEL, `${level}`);
           navigate("/games/zhaobutong/start");
         }}
@@ -82,8 +79,8 @@ export const Level: FC<{
           </div>
           {!locked && !gotProp ? (
             <img
-              className="w-[32rem] h-[32rem] absolute bottom-[10rem] right-0 z-[1]"
-              src={gamePropIcon}
+              className="w-[48rem] absolute bottom-0 right-[-12rem] z-[1]"
+              src={gamePropStaticIcon}
             />
           ) : null}
         </div>

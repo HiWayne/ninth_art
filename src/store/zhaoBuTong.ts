@@ -9,6 +9,8 @@ export interface ZhaoBuTongStore {
   setTotalStars: (stars: number) => void;
 }
 
+export const REMAINING_TIME = 120000; // 毫秒
+
 export const SAVED_LEVEL = "SAVED_LEVEL";
 export const SAVED_LEVELS_SCORE = "SAVED_LEVELS_SCORE";
 export const SAVED_PROPS = "SAVED_PROPS";
@@ -17,6 +19,38 @@ export const SAVED_TOTAL_STARS = "SAVED_TOTAL_STARS";
 const currentLevel = window.localStorage.getItem(SAVED_LEVEL) || "0";
 const savedProps = window.localStorage.getItem(SAVED_PROPS) || `0`;
 const savedTotalStars = window.localStorage.getItem(SAVED_TOTAL_STARS) || `0`;
+
+export let savedLevelsScoreRef: {
+  current: Record<
+    number,
+    {
+      level: number;
+      score: number | null;
+      remainingTime: number;
+      speedTime: number | null;
+      minSpeedTime: number | null;
+      recordDate: number | null;
+      gotProp: boolean;
+    }
+  >;
+} = { current: {} };
+try {
+  savedLevelsScoreRef.current = JSON.parse(
+    window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
+  );
+} catch {
+  savedLevelsScoreRef.current = {
+    0: {
+      level: 0,
+      score: null,
+      remainingTime: REMAINING_TIME,
+      speedTime: null,
+      minSpeedTime: null,
+      recordDate: null,
+      gotProp: false,
+    },
+  };
+}
 
 const createZhaoBuTongStore: (
   set: (

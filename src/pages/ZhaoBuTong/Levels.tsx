@@ -1,58 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import useStore from "@/store";
 import shallow from "zustand/shallow";
-import { SAVED_LEVELS_SCORE, SAVED_PROPS, charList } from "@/store/zhaoBuTong";
+import {
+  REMAINING_TIME,
+  SAVED_LEVELS_SCORE,
+  SAVED_PROPS,
+  charList,
+  savedLevelsScoreRef,
+} from "@/store/zhaoBuTong";
 import bg from "./assets/images/levels/bg.png";
 import closeIcon from "./assets/images/levels/close.png";
 import backIcon from "./assets/images/levels/back_btn.png";
 import shopIcon from "./assets/images/levels/store_btn.png";
 import gamePropStaticIcon from "./assets/images/game_prop_static.png";
-import starActiveIcon from "./assets/images/levels/star_active.png";
+import starActiveIcon from "./assets/images/star.png";
+import levelsBgIcon from "./assets/images/levels_bg.jpg";
 import skranjiBoldFont from "./assets/fonts/Skranji-Bold.otf";
 import { LeftArrow, Level, Pagination, RightArrow } from "./components/Levels";
-import { REMAINING_TIME } from "./Game";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 
 const PAGE_SIZE = 10;
 
-let savedLevelsScoreRef: {
-  current: Record<
-    number,
-    {
-      level: number;
-      score: number | null;
-      remainingTime: number;
-      speedTime: number | null;
-      minSpeedTime: number | null;
-      recordDate: number | null;
-      gotProp: boolean;
-    }
-  >;
-} = { current: {} };
-try {
-  savedLevelsScoreRef.current = JSON.parse(
-    window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
-  );
-} catch {
-  savedLevelsScoreRef.current = {
-    0: {
-      level: 0,
-      score: null,
-      remainingTime: REMAINING_TIME,
-      speedTime: null,
-      minSpeedTime: null,
-      recordDate: null,
-      gotProp: false,
-    },
-  };
-}
-
 const Levels = styled(() => {
-  const { currentLevel, gamePropsCount } = useStore(
+  const { currentLevel, gamePropsCount, totalStars } = useStore(
     (state) => ({
       currentLevel: state.zhaoBuTong.currentLevel,
       gamePropsCount: state.zhaoBuTong.gamePropsCount,
+      totalStars: state.zhaoBuTong.totalStars,
     }),
     shallow
   );
@@ -76,9 +51,8 @@ const Levels = styled(() => {
       ) {
         return level;
       }
-      return level + 1;
     }
-    return 0;
+    return levels.length;
   }, []);
 
   const navigate = useNavigate();
@@ -104,16 +78,34 @@ const Levels = styled(() => {
   }, []);
 
   return (
-    <div className="flex justify-center items-center w-[100%] h-[100%]">
-      <div>
-        <div>
-          <img src={gamePropStaticIcon} />x{gamePropsCount}
+    <div
+      className="relative flex justify-center items-center w-[100%] h-[100%]"
+      style={{
+        background: `url('${levelsBgIcon}') left top / cover no-repeat`,
+      }}
+    >
+      <div className="absolute right-[12rem] top-[120rem] w-[100%] flex flex-col justify-start items-end">
+        <div className="flex justify-start items-center w-[240rem] translate-x-[38rem]">
+          <img className="inline-block w-[72rem]" src={starActiveIcon} />
+          <span
+            className="ml-[12rem] font-[Skranji-Bold] text-[#fff] text-[24px] translate-x-[18rem]"
+            style={{ WebkitTextStroke: "2px #3a230a" }}
+          >
+            {totalStars}
+          </span>
         </div>
-        <div>
-          <img src={starActiveIcon} />
+        <div className="mt-[12rem] flex justify-start items-center w-[240rem]">
+          <img className="inline-block w-[128rem]" src={gamePropStaticIcon} />
+          <span
+            className="ml-[12rem] font-[Skranji-Bold] text-[#fff] text-[24px]"
+            style={{ WebkitTextStroke: "2px #3a230a" }}
+          >
+            {gamePropsCount}
+          </span>
         </div>
       </div>
-      <div className="relative w-[700rem]">
+
+      <div className="relative w-[700rem] translate-y-[-72rem]">
         <img src={bg} />
         <div className="ml-[-12rem] absolute overflow-hidden left-[86rem] top-[140rem] w-[550rem]">
           <div

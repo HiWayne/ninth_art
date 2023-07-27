@@ -12,7 +12,7 @@ const channels = [
   {
     path: "/games/zhaobutong",
     image: wenZiZhaoBuTongIcon,
-    name: "汉字找不同",
+    name: "文字找不同",
   },
   // {
   //   path: "/game/restaurant",

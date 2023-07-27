@@ -1,6 +1,3 @@
-import { Flex } from "@/shared/components";
-import { randomNumber, randomlyTaken } from "@/shared/utils";
-import useStore from "@/store";
 import {
   FC,
   MouseEventHandler,
@@ -10,6 +7,10 @@ import {
   useRef,
   useState,
 } from "react";
+import { useNavigate } from "react-router-dom";
+import { Flex } from "@/shared/components";
+import { randomNumber, randomlyTaken } from "@/shared/utils";
+import useStore from "@/store";
 import styled from "styled-components";
 import shallow from "zustand/shallow";
 import {
@@ -22,14 +23,18 @@ import {
   HelpButton,
 } from "./components";
 import {
+  REMAINING_TIME,
   SAVED_LEVEL,
   SAVED_LEVELS_SCORE,
   SAVED_PROPS,
+  SAVED_TOTAL_STARS,
   charList,
+  savedLevelsScoreRef,
 } from "@/store/zhaoBuTong";
 import correctIcon from "./assets/images/correct.png";
 import errorIcon from "./assets/images/error.png";
-import { useNavigate } from "react-router-dom";
+import gamePropStaticIcon from "./assets/images/game_prop_static.png";
+import skranjiBoldFont from "./assets/fonts/Skranji-Bold.otf";
 
 interface Answers {
   row: number;
@@ -104,41 +109,8 @@ const GridItem = styled<
 
 const ROW_COUNT = 10;
 const COLUMN_COUNT = 10;
-export const REMAINING_TIME = 120000; // 毫秒
-let savedLevelsScoreRef: {
-  current: Record<
-    number,
-    {
-      level: number;
-      score: number | null;
-      remainingTime: number;
-      speedTime: number | null;
-      minSpeedTime: number | null;
-      recordDate: number | null;
-      gotProp: boolean;
-    }
-  >;
-} = { current: {} };
-try {
-  savedLevelsScoreRef.current = JSON.parse(
-    window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
-  );
-} catch {
-  savedLevelsScoreRef.current = {
-    0: {
-      level: 0,
-      score: null,
-      remainingTime: REMAINING_TIME,
-      speedTime: null,
-      minSpeedTime: null,
-      recordDate: null,
-      gotProp: false,
-    },
-  };
-}
-const savedProps = window.localStorage.getItem(SAVED_PROPS) || `0`;
 
-const ZhaoBuTong = () => {
+const ZhaoBuTong = styled(() => {
   const {
     currentLevel,
     setCurrentLevel,
@@ -146,6 +118,7 @@ const ZhaoBuTong = () => {
     setShaking,
     gamePropsCount,
     setGamePropsCount,
+    setTotalStars,
   } = useStore(
     (state) => ({
       currentLevel: state.zhaoBuTong.currentLevel,
@@ -154,6 +127,7 @@ const ZhaoBuTong = () => {
       setShaking: state.zhaoBuTong.setShaking,
       gamePropsCount: state.zhaoBuTong.gamePropsCount,
       setGamePropsCount: state.zhaoBuTong.setGamePropsCount,
+      setTotalStars: state.zhaoBuTong.setTotalStars,
     }),
     shallow
   );
@@ -176,9 +150,7 @@ const ZhaoBuTong = () => {
   // 本关使用了道具
   const [usedProp, setUsedProp] = useState(false);
   // 本关获得了道具
-  const [gotProp, setGotProp] = useState(
-    savedLevelsScoreRef.current[currentLevel].gotProp
-  );
+  const [gotProp, setGotProp] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [clickedPosition, setClickedPosition] = useState<Answers | null>(null);
@@ -196,7 +168,7 @@ const ZhaoBuTong = () => {
       row,
       column,
     };
-  }, [currentLevel]);
+  }, [currentLevel, replayCounts]);
 
   const navigate = useNavigate();
 
@@ -205,11 +177,12 @@ const ZhaoBuTong = () => {
     setSuccess(false);
     setError(false);
     setClickedPosition(null);
-    setGotProp(savedLevelsScoreRef.current[currentLevel].gotProp);
+    setGotProp(false);
     setSuccessPopVisibility(false);
     setFailPopVisibility(false);
     setInfoPopVisibility(false);
     setCurrentStars(3);
+    setUsedProp(false);
     currentLevelStartTimeRef.current = Date.now();
     speedTimeRef.current = 0;
   }, [currentLevel]);
@@ -266,14 +239,19 @@ const ZhaoBuTong = () => {
       ) {
         clearTimeout(timerRef.current!);
         setSuccess(true);
-
         // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具。本关已获得过道具除外
-        if (!gotProp && !usedProp && speedTimeRef.current <= 10000) {
+        let currentGotProp = false;
+        console.log(savedLevelsScoreRef.current[currentLevel]?.gotProp, usedProp, speedTimeRef.current)
+        if (
+          !savedLevelsScoreRef.current[currentLevel]?.gotProp &&
+          !usedProp &&
+          speedTimeRef.current <= 10000
+        ) {
+          currentGotProp = true;
           setGotProp(true);
           setGamePropsCount(gamePropsCount + 1);
           window.localStorage.setItem(SAVED_PROPS, `${gamePropsCount + 1}`);
         }
-
         if (!savedLevelsScoreRef.current[currentLevel]) {
           savedLevelsScoreRef.current[currentLevel] = {
             level: currentLevel,
@@ -282,14 +260,25 @@ const ZhaoBuTong = () => {
             speedTime: null,
             minSpeedTime: null,
             recordDate: null,
-            gotProp,
+            gotProp: currentGotProp,
           };
+        }
+        if (
+          !savedLevelsScoreRef.current[currentLevel].score ||
+          (savedLevelsScoreRef.current[currentLevel].score &&
+            currentStars > savedLevelsScoreRef.current[currentLevel].score!)
+        ) {
+          const savedTotalStars =
+            window.localStorage.getItem(SAVED_TOTAL_STARS) || "0";
+          const totalStars = currentStars + parseInt(savedTotalStars);
+          setTotalStars(totalStars);
+          window.localStorage.setItem(SAVED_TOTAL_STARS, `${totalStars}`);
         }
         savedLevelsScoreRef.current[currentLevel].score = currentStars;
         savedLevelsScoreRef.current[currentLevel].speedTime =
           speedTimeRef.current;
         if (!savedLevelsScoreRef.current[currentLevel].gotProp) {
-          savedLevelsScoreRef.current[currentLevel].gotProp = gotProp;
+          savedLevelsScoreRef.current[currentLevel].gotProp = currentGotProp;
         }
         if (
           !savedLevelsScoreRef.current[currentLevel].minSpeedTime ||
@@ -320,7 +309,7 @@ const ZhaoBuTong = () => {
         }, 1000);
       }
     },
-    [answers, remainingTime, gamePropsCount, usedProp, currentStars, gotProp]
+    [answers, remainingTime, gamePropsCount, usedProp, currentStars]
   );
 
   const openHelp = useCallback(() => {
@@ -421,26 +410,6 @@ const ZhaoBuTong = () => {
     setCurrentStars(score);
   }, [remainingTime]);
 
-  useEffect(() => {
-    try {
-      savedLevelsScoreRef.current = JSON.parse(
-        window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
-      );
-    } catch {
-      savedLevelsScoreRef.current = {
-        0: {
-          level: 0,
-          score: null,
-          remainingTime: REMAINING_TIME,
-          speedTime: null,
-          minSpeedTime: null,
-          recordDate: null,
-          gotProp: false,
-        },
-      };
-    }
-  }, []);
-
   return (
     <Wrapper>
       <Flex
@@ -465,16 +434,18 @@ const ZhaoBuTong = () => {
             }}
           />
           <HelpButton onClick={openHelp}>
-            查看提示
+            提示剩余
+            <img className="inline-block w-[60rem]" src={gamePropStaticIcon} />
             <span
+              className="ml-[8rem] font-[Skranji-Bold]"
               style={{
-                marginLeft: "2px",
-                color: "#ff4d4f",
+                color: "#fff",
                 fontWeight: "bold",
                 fontSize: "20px",
+                WebkitTextStroke: "2px #3a230a",
               }}
             >
-              x{gamePropsCount}
+              {gamePropsCount}
             </span>
           </HelpButton>
         </Flex>
@@ -483,10 +454,10 @@ const ZhaoBuTong = () => {
             <CurrentChar>找到：{currentChars[0]}</CurrentChar>
             <LevelText>第{currentLevel + 1}关</LevelText>
             <Stars
-              counts={3}
+              counts={currentStars}
               style={{
                 position: "absolute",
-                right: "0",
+                right: "-4rem",
                 top: "50%",
                 transform: "translate(100%, -50%)",
               }}
@@ -546,6 +517,11 @@ const ZhaoBuTong = () => {
       </InfoPop>
     </Wrapper>
   );
-};
+})`
+  @font-face {
+    font-family: "Skranji-Bold";
+    src: url("${skranjiBoldFont}");
+  }
+`;
 
 export default ZhaoBuTong;

@@ -27,9 +27,12 @@ const gameRoutes: RouteType[] = [
         element: Layout,
         children: [
           {
-            path: "levels",
             element: ZhaoBuTongLevels,
             index: true,
+          },
+          {
+            path: "levels",
+            element: ZhaoBuTongLevels,
           },
           {
             path: "start",
