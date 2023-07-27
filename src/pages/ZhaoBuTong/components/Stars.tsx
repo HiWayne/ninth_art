@@ -1,6 +1,6 @@
 import { CSSProperties, FC } from "react";
 import styled from "styled-components";
-import starIcon from "assets/images/star.png";
+import starIcon from "../assets/images/star.png";
 
 export const Star = styled<FC<{ className?: string; light: boolean; size: number }>>(
   ({ className }) => {

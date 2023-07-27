@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import leftArrow from "assets/images/left_arrow.png";
+import leftArrow from "../assets/images/left_arrow.png";
 
 export const BackButton = styled.div`
   display: inline-block;

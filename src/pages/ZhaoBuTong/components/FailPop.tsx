@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef } from "react";
-import failIcon from "assets/images/fail.png";
-import restartIcon from "assets/images/restart.png";
+import failIcon from "../assets/images/fail.png";
+import restartIcon from "../assets/images/restart.png";
 
 export const FailPop: FC<{ visibility: boolean; onClick: () => void }> = ({
   visibility,

@@ -1,17 +1,22 @@
 export interface ZhaoBuTongStore {
-  currentChars: string[];
   currentLevel: number;
+  gamePropsCount: number;
   shaking: boolean;
+  totalStars: number;
   setShaking: (shaking: boolean) => void;
-  setCurrentChar: (chars: string[]) => void;
+  setGamePropsCount: (count: number) => void;
   setCurrentLevel: (index: number) => void;
+  setTotalStars: (stars: number) => void;
 }
 
 export const SAVED_LEVEL = "SAVED_LEVEL";
 export const SAVED_LEVELS_SCORE = "SAVED_LEVELS_SCORE";
 export const SAVED_PROPS = "SAVED_PROPS";
+export const SAVED_TOTAL_STARS = "SAVED_TOTAL_STARS";
 
 const currentLevel = window.localStorage.getItem(SAVED_LEVEL) || "0";
+const savedProps = window.localStorage.getItem(SAVED_PROPS) || `0`;
+const savedTotalStars = window.localStorage.getItem(SAVED_TOTAL_STARS) || `0`;
 
 const createZhaoBuTongStore: (
   set: (
@@ -19,22 +24,28 @@ const createZhaoBuTongStore: (
     shouldReplace?: boolean | undefined
   ) => void
 ) => ZhaoBuTongStore = (set) => ({
-  currentChars: charList[0],
   currentLevel: parseInt(currentLevel),
+  gamePropsCount: parseInt(savedProps),
   shaking: false,
+  totalStars: parseInt(savedTotalStars),
   setShaking(shaking) {
     set((state) => {
       state.zhaoBuTong.shaking = shaking;
     });
   },
-  setCurrentChar(char) {
+  setGamePropsCount(count) {
     set((state) => {
-      state.zhaoBuTong.currentChars = char;
+      state.zhaoBuTong.gamePropsCount = count;
     });
   },
   setCurrentLevel(index) {
     set((state) => {
       state.zhaoBuTong.currentLevel = index;
+    });
+  },
+  setTotalStars(stars) {
+    set((state) => {
+      state.zhaoBuTong.totalStars = stars;
     });
   },
 });

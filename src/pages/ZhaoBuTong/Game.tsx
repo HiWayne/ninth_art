@@ -27,8 +27,9 @@ import {
   SAVED_PROPS,
   charList,
 } from "@/store/zhaoBuTong";
-import correctIcon from "assets/images/correct.png";
-import errorIcon from "assets/images/error.png";
+import correctIcon from "./assets/images/correct.png";
+import errorIcon from "./assets/images/error.png";
+import { useNavigate } from "react-router-dom";
 
 interface Answers {
   row: number;
@@ -104,24 +105,26 @@ const GridItem = styled<
 const ROW_COUNT = 10;
 const COLUMN_COUNT = 10;
 export const REMAINING_TIME = 120000; // 毫秒
-let savedLevelsScore: Record<
-  number,
-  {
-    level: number;
-    score: number | null;
-    remainingTime: number;
-    speedTime: number | null;
-    minSpeedTime: number | null;
-    recordDate: number | null;
-    gotProp: boolean;
-  }
->;
+let savedLevelsScoreRef: {
+  current: Record<
+    number,
+    {
+      level: number;
+      score: number | null;
+      remainingTime: number;
+      speedTime: number | null;
+      minSpeedTime: number | null;
+      recordDate: number | null;
+      gotProp: boolean;
+    }
+  >;
+} = { current: {} };
 try {
-  savedLevelsScore = JSON.parse(
+  savedLevelsScoreRef.current = JSON.parse(
     window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
   );
 } catch {
-  savedLevelsScore = {
+  savedLevelsScoreRef.current = {
     0: {
       level: 0,
       score: null,
@@ -137,28 +140,30 @@ const savedProps = window.localStorage.getItem(SAVED_PROPS) || `0`;
 
 const ZhaoBuTong = () => {
   const {
-    currentChars,
-    setCurrentChar,
     currentLevel,
     setCurrentLevel,
     shaking,
     setShaking,
+    gamePropsCount,
+    setGamePropsCount,
   } = useStore(
     (state) => ({
-      currentChars: state.zhaoBuTong.currentChars,
-      setCurrentChar: state.zhaoBuTong.setCurrentChar,
       currentLevel: state.zhaoBuTong.currentLevel,
       setCurrentLevel: state.zhaoBuTong.setCurrentLevel,
       shaking: state.zhaoBuTong.shaking,
       setShaking: state.zhaoBuTong.setShaking,
+      gamePropsCount: state.zhaoBuTong.gamePropsCount,
+      setGamePropsCount: state.zhaoBuTong.setGamePropsCount,
     }),
     shallow
   );
 
+  const currentChars = useMemo(() => charList[currentLevel], [currentLevel]);
+
   const [successPopVisibility, setSuccessPopVisibility] = useState(false);
   const [remainingTime, setRemainingTime] = useState(
-    savedLevelsScore[currentLevel]?.remainingTime
-      ? savedLevelsScore[currentLevel].remainingTime
+    savedLevelsScoreRef.current[currentLevel]?.remainingTime
+      ? savedLevelsScoreRef.current[currentLevel].remainingTime
       : REMAINING_TIME
   );
   const [currentTotalGameTime, setCurrentTotalGameTime] =
@@ -168,21 +173,21 @@ const ZhaoBuTong = () => {
   const [failPopVisibility, setFailPopVisibility] = useState(false);
   const [infoPopVisibility, setInfoPopVisibility] = useState(false);
   const [infoText, setInfoText] = useState("");
-  // 道具数量
-  const [gameProps, setGameProps] = useState(parseInt(savedProps));
   // 本关使用了道具
   const [usedProp, setUsedProp] = useState(false);
   // 本关获得了道具
   const [gotProp, setGotProp] = useState(
-    savedLevelsScore[currentLevel].gotProp
+    savedLevelsScoreRef.current[currentLevel].gotProp
   );
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [clickedPosition, setClickedPosition] = useState<Answers | null>(null);
+  const [currentStars, setCurrentStars] = useState(3);
+  const [replayCounts, setReplayCounts] = useState(0);
 
   const timerRef = useRef<number | null>(null);
-
   const currentLevelStartTimeRef = useRef(Date.now());
+  const speedTimeRef = useRef(0);
 
   const answers = useMemo<Answers>(() => {
     const row = randomNumber(0, ROW_COUNT - 1);
@@ -191,24 +196,29 @@ const ZhaoBuTong = () => {
       row,
       column,
     };
-  }, [currentChars]);
+  }, [currentLevel]);
+
+  const navigate = useNavigate();
 
   // 重置关卡的通用信息
   const resetLevel = useCallback(() => {
     setSuccess(false);
     setError(false);
     setClickedPosition(null);
-    setGotProp(savedLevelsScore[currentLevel].gotProp);
+    setGotProp(savedLevelsScoreRef.current[currentLevel].gotProp);
     setSuccessPopVisibility(false);
     setFailPopVisibility(false);
     setInfoPopVisibility(false);
+    setCurrentStars(3);
     currentLevelStartTimeRef.current = Date.now();
+    speedTimeRef.current = 0;
   }, [currentLevel]);
 
   // 重玩本关
   const restartLevel = useCallback(() => {
     resetLevel();
     setRemainingTime(currentTotalGameTime);
+    setReplayCounts((counts) => counts + 1);
   }, [resetLevel]);
 
   // 下一关
@@ -219,7 +229,7 @@ const ZhaoBuTong = () => {
       const extractTime = randomNumber(30000, 60000);
       const nextLevelTime = remainingTime + extractTime;
       window.localStorage.setItem(SAVED_LEVEL, `${currentLevel + 1}`);
-      savedLevelsScore[currentLevel + 1] = {
+      savedLevelsScoreRef.current[currentLevel + 1] = {
         level: currentLevel + 1,
         score: null,
         remainingTime: nextLevelTime,
@@ -230,13 +240,13 @@ const ZhaoBuTong = () => {
       };
       window.localStorage.setItem(
         SAVED_LEVELS_SCORE,
-        JSON.stringify(savedLevelsScore)
+        JSON.stringify(savedLevelsScoreRef.current)
       );
       setCurrentLevel(currentLevel + 1);
-      setCurrentChar(charList[currentLevel + 1]);
       setAddTime(extractTime);
       setRemainingTime(nextLevelTime);
       setCurrentTotalGameTime(nextLevelTime);
+      setReplayCounts(0);
       setTimeout(() => {
         setAddTime(0);
       }, 1000);
@@ -256,23 +266,16 @@ const ZhaoBuTong = () => {
       ) {
         clearTimeout(timerRef.current!);
         setSuccess(true);
-        const speedTime = Date.now() - currentLevelStartTimeRef.current;
+
         // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具。本关已获得过道具除外
-        if (!gotProp && !usedProp && speedTime <= 10000) {
-          setGameProps((props) => props + 1);
+        if (!gotProp && !usedProp && speedTimeRef.current <= 10000) {
           setGotProp(true);
-          window.localStorage.setItem(SAVED_PROPS, `${gameProps + 1}`);
+          setGamePropsCount(gamePropsCount + 1);
+          window.localStorage.setItem(SAVED_PROPS, `${gamePropsCount + 1}`);
         }
-        let score: number;
-        if (speedTime <= 60000) {
-          score = 3;
-        } else if (speedTime <= 90000) {
-          score = 2;
-        } else {
-          score = 1;
-        }
-        if (!savedLevelsScore[currentLevel]) {
-          savedLevelsScore[currentLevel] = {
+
+        if (!savedLevelsScoreRef.current[currentLevel]) {
+          savedLevelsScoreRef.current[currentLevel] = {
             level: currentLevel,
             score: null,
             remainingTime: currentTotalGameTime,
@@ -282,19 +285,25 @@ const ZhaoBuTong = () => {
             gotProp,
           };
         }
-        savedLevelsScore[currentLevel].score = score;
-        savedLevelsScore[currentLevel].speedTime = speedTime;
+        savedLevelsScoreRef.current[currentLevel].score = currentStars;
+        savedLevelsScoreRef.current[currentLevel].speedTime =
+          speedTimeRef.current;
+        if (!savedLevelsScoreRef.current[currentLevel].gotProp) {
+          savedLevelsScoreRef.current[currentLevel].gotProp = gotProp;
+        }
         if (
-          !savedLevelsScore[currentLevel].minSpeedTime ||
-          (savedLevelsScore[currentLevel].minSpeedTime &&
-            speedTime < savedLevelsScore[currentLevel].minSpeedTime!)
+          !savedLevelsScoreRef.current[currentLevel].minSpeedTime ||
+          (savedLevelsScoreRef.current[currentLevel].minSpeedTime &&
+            speedTimeRef.current <
+              savedLevelsScoreRef.current[currentLevel].minSpeedTime!)
         ) {
-          savedLevelsScore[currentLevel].minSpeedTime = speedTime;
-          savedLevelsScore[currentLevel].recordDate = Date.now();
+          savedLevelsScoreRef.current[currentLevel].minSpeedTime =
+            speedTimeRef.current;
+          savedLevelsScoreRef.current[currentLevel].recordDate = Date.now();
         }
         window.localStorage.setItem(
           SAVED_LEVELS_SCORE,
-          JSON.stringify(savedLevelsScore)
+          JSON.stringify(savedLevelsScoreRef.current)
         );
         setSuccessPopVisibility(true);
       } else {
@@ -311,13 +320,14 @@ const ZhaoBuTong = () => {
         }, 1000);
       }
     },
-    [answers, remainingTime, gameProps, usedProp]
+    [answers, remainingTime, gamePropsCount, usedProp, currentStars, gotProp]
   );
 
   const openHelp = useCallback(() => {
-    if (gameProps > 0) {
+    if (gamePropsCount > 0) {
       setUsedProp(true);
-      window.localStorage.setItem(SAVED_PROPS, `${gameProps - 1}`);
+      setGamePropsCount(gamePropsCount - 1);
+      window.localStorage.setItem(SAVED_PROPS, `${gamePropsCount - 1}`);
       setInfoPopVisibility(true);
       const helpTypeIsColumn = Math.random() < 0.5;
       const offset = randomlyTaken([-1, 0, 1], 1).result[0];
@@ -372,9 +382,9 @@ const ZhaoBuTong = () => {
           ? `试着找找${helpRange.join(", ")}列里的字`
           : `线索在${helpRange.join(", ")}行里哦`
       );
-      setGameProps((props) => props - 1);
+      setGamePropsCount(gamePropsCount - 1);
     }
-  }, [gameProps, answers]);
+  }, [gamePropsCount, answers]);
 
   const closeHelp = useCallback(() => {
     setInfoPopVisibility(false);
@@ -396,7 +406,40 @@ const ZhaoBuTong = () => {
       }
     }
     return () => clearTimeout(timerRef.current!);
-  }, [currentChars, remainingTime, infoPopVisibility]);
+  }, [currentLevel, replayCounts, remainingTime, infoPopVisibility]);
+
+  useEffect(() => {
+    speedTimeRef.current = Date.now() - currentLevelStartTimeRef.current;
+    let score: number;
+    if (speedTimeRef.current <= 60000) {
+      score = 3;
+    } else if (speedTimeRef.current <= 90000) {
+      score = 2;
+    } else {
+      score = 1;
+    }
+    setCurrentStars(score);
+  }, [remainingTime]);
+
+  useEffect(() => {
+    try {
+      savedLevelsScoreRef.current = JSON.parse(
+        window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
+      );
+    } catch {
+      savedLevelsScoreRef.current = {
+        0: {
+          level: 0,
+          score: null,
+          remainingTime: REMAINING_TIME,
+          speedTime: null,
+          minSpeedTime: null,
+          recordDate: null,
+          gotProp: false,
+        },
+      };
+    }
+  }, []);
 
   return (
     <Wrapper>
@@ -418,7 +461,7 @@ const ZhaoBuTong = () => {
         >
           <BackButton
             onClick={() => {
-              window.history.back();
+              navigate("/games/zhaobutong/levels");
             }}
           />
           <HelpButton onClick={openHelp}>
@@ -431,13 +474,13 @@ const ZhaoBuTong = () => {
                 fontSize: "20px",
               }}
             >
-              x{gameProps}
+              x{gamePropsCount}
             </span>
           </HelpButton>
         </Flex>
         <Flex justify="center" align="center" style={{ width: "100%" }}>
           <LevelInfo>
-            <CurrentChar>找到：{currentChars[currentLevel]}</CurrentChar>
+            <CurrentChar>找到：{currentChars[0]}</CurrentChar>
             <LevelText>第{currentLevel + 1}关</LevelText>
             <Stars
               counts={3}
@@ -487,6 +530,7 @@ const ZhaoBuTong = () => {
       </Flex>
       <SuccessPop
         visibility={successPopVisibility}
+        stars={currentStars}
         onNext={goNextLevel}
         onRestart={restartLevel}
         gotProp={gotProp}
