@@ -1,10 +1,55 @@
 export interface ZhaoBuTongStore {
-  currentChars: string[];
-  currentIndex: number;
+  currentLevel: number;
+  gamePropsCount: number;
   shaking: boolean;
+  totalStars: number;
   setShaking: (shaking: boolean) => void;
-  setCurrentChar: (chars: string[]) => void;
-  setCurrentIndex: (index: number) => void;
+  setGamePropsCount: (count: number) => void;
+  setCurrentLevel: (index: number) => void;
+  setTotalStars: (stars: number) => void;
+}
+
+export const REMAINING_TIME = 120000; // 毫秒
+
+export const SAVED_LEVEL = "SAVED_LEVEL";
+export const SAVED_LEVELS_SCORE = "SAVED_LEVELS_SCORE";
+export const SAVED_PROPS = "SAVED_PROPS";
+export const SAVED_TOTAL_STARS = "SAVED_TOTAL_STARS";
+
+const currentLevel = window.localStorage.getItem(SAVED_LEVEL) || "0";
+const savedProps = window.localStorage.getItem(SAVED_PROPS) || `0`;
+const savedTotalStars = window.localStorage.getItem(SAVED_TOTAL_STARS) || `0`;
+
+export let savedLevelsScoreRef: {
+  current: Record<
+    number,
+    {
+      level: number;
+      score: number | null;
+      remainingTime: number;
+      speedTime: number | null;
+      minSpeedTime: number | null;
+      recordDate: number | null;
+      gotProp: boolean;
+    }
+  >;
+} = { current: {} };
+try {
+  savedLevelsScoreRef.current = JSON.parse(
+    window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
+  );
+} catch {
+  savedLevelsScoreRef.current = {
+    0: {
+      level: 0,
+      score: null,
+      remainingTime: REMAINING_TIME,
+      speedTime: null,
+      minSpeedTime: null,
+      recordDate: null,
+      gotProp: false,
+    },
+  };
 }
 
 const createZhaoBuTongStore: (
@@ -13,22 +58,28 @@ const createZhaoBuTongStore: (
     shouldReplace?: boolean | undefined
   ) => void
 ) => ZhaoBuTongStore = (set) => ({
-  currentChars: charList[0],
-  currentIndex: 0,
+  currentLevel: parseInt(currentLevel),
+  gamePropsCount: parseInt(savedProps),
   shaking: false,
+  totalStars: parseInt(savedTotalStars),
   setShaking(shaking) {
     set((state) => {
       state.zhaoBuTong.shaking = shaking;
     });
   },
-  setCurrentChar(char) {
+  setGamePropsCount(count) {
     set((state) => {
-      state.zhaoBuTong.currentChars = char;
+      state.zhaoBuTong.gamePropsCount = count;
     });
   },
-  setCurrentIndex(index) {
+  setCurrentLevel(index) {
     set((state) => {
-      state.zhaoBuTong.currentIndex = index;
+      state.zhaoBuTong.currentLevel = index;
+    });
+  },
+  setTotalStars(stars) {
+    set((state) => {
+      state.zhaoBuTong.totalStars = stars;
     });
   },
 });
@@ -36,4 +87,55 @@ const createZhaoBuTongStore: (
 export default createZhaoBuTongStore;
 
 // 0-要找的字、1-多数的字
-export const charList: string[][] = [["已", "己"], ["犬", "大"]];
+export const charList: string[][] = [
+  ["体", "休"],
+  ["犬", "大"],
+  ["已", "己"],
+  ["木", "本"],
+  ["太", "大"],
+  ["天", "夫"],
+  ["俺", "掩"],
+  ["扬", "杨"],
+  ["洋", "详"],
+  ["谣", "摇"],
+  ["辩", "辨"],
+  ["売", "壳"],
+  ["団", "团"],
+  ["挙", "举"],
+  ["圧", "压"],
+  ["抜", "拔"],
+  ["汚", "污"],
+  ["涼", "凉"],
+  ["収", "收"],
+  ["歩", "步"],
+  ["呂", "吕"],
+  ["荼", "茶"],
+  ["孓", "孑"],
+  ["匸", "匚"],
+  ["釆", "采"],
+  ["妹", "妺"],
+  ["氽", "汆"],
+  ["睢", "雎"],
+  ["戍", "戊"],
+  ["巿", "市"],
+  ["祗", "祇"],
+  ["骛", "鹜"],
+  ["浇", "绕"],
+  ["壵", "垚"],
+  ["姫", "姬"],
+  ["毫", "亳"],
+  ["袆", "祎"],
+  ["壸", "壶"],
+  ["袑", "祒"],
+  ["洗", "冼"],
+  ["夊", "夂"],
+  ["乓", "乒"],
+  ["芺", "芙"],
+  ["嫐", "嬲"],
+  ["掱", "毳"],
+  ["帀", "币"],
+  ["褔", "福"],
+  ["萭", "萬"],
+  ["汨", "汩"],
+  ["麈", "塵"],
+];

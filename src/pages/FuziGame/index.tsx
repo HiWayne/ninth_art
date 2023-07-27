@@ -32,8 +32,8 @@ import {
   TitleWrapper,
 } from "./shared/components/Titles";
 import Subtitle from "./shared/components/SubTitle";
-import startButtonIcon from "assets/images/start_button.png";
-import settingButtonIcon from "assets/images/setting_button@64.png";
+import startButtonIcon from "./assets/images/start_button.png";
+import settingButtonIcon from "./assets/images/setting_button@64.png";
 import { Flex } from "@/shared/components";
 import produce from "immer";
 import { randomlyTaken } from "@/shared/utils";

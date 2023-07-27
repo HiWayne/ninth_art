@@ -5,14 +5,14 @@ import wenZiZhaoBuTongIcon from "assets/images/wen_zi_zhao_bu_tong.jpeg";
 
 const channels = [
   {
-    path: "/game/fuzi",
+    path: "/games/fuzi",
     image: fuziIcon,
     name: "淘气的福字",
   },
   {
-    path: "/game/zhaobutong",
+    path: "/games/zhaobutong",
     image: wenZiZhaoBuTongIcon,
-    name: "汉字找不同",
+    name: "文字找不同",
   },
   // {
   //   path: "/game/restaurant",

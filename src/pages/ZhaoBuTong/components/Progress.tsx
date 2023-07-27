@@ -5,30 +5,48 @@ export const Progress = styled<
   FC<{
     className?: string;
     remainingTime: number;
+    addTime?: number;
     decreaseTime?: number;
     currentTotalGameTime: number;
   }>
->(({ className, remainingTime, decreaseTime = 0, currentTotalGameTime }) => {
-  return (
-    <div className={className}>
-      <span className="progress-bar">
-        <span
-          style={{
-            width: `${((remainingTime / currentTotalGameTime) * 100).toFixed(
-              2
-            )}%`,
-          }}
-        />
-      </span>
-      <span className="text">
-        {Math.round(remainingTime / 1000)}秒
-        <span style={decreaseTime ? { opacity: 1 } : { opacity: 0 }}>
-          {decreaseTime ? `-${Math.round(decreaseTime / 1000)}` : ""}
+>(
+  ({
+    className,
+    remainingTime,
+    addTime = 0,
+    decreaseTime = 0,
+    currentTotalGameTime,
+  }) => {
+    return (
+      <div className={className}>
+        <span className="progress-bar">
+          <span
+            style={{
+              width: `${((remainingTime / currentTotalGameTime) * 100).toFixed(
+                2
+              )}%`,
+            }}
+          />
         </span>
-      </span>
-    </div>
-  );
-})`
+        <span className="text">
+          {Math.round(remainingTime / 1000)}秒
+          <span
+            className={
+              addTime ? "add-time" : decreaseTime ? "decrease-time" : ""
+            }
+            style={addTime || decreaseTime ? { opacity: 1 } : { opacity: 0 }}
+          >
+            {decreaseTime
+              ? `-${Math.round(decreaseTime / 1000)}`
+              : addTime
+              ? `+${Math.round(addTime / 1000)}`
+              : ""}
+          </span>
+        </span>
+      </div>
+    );
+  }
+)`
   margin-top: 4px;
   padding: 4px 12px 4px 36px;
   display: flex;
@@ -44,7 +62,7 @@ export const Progress = styled<
     & > span {
       display: inline-block;
       height: 100%;
-      background-color: #e3e322;
+      background-color: #ef9535;
       border-radius: 8px;
       transition: width 1s linear;
     }
@@ -54,13 +72,19 @@ export const Progress = styled<
     justify-content: flex-start;
     align-items: center;
     min-width: 70px;
-    color: #fff;
+    height: 20px;
+    color: #1b1d12;
     & > span {
       margin-left: 4px;
       transition: opacity 0.3s ease-out;
-      color: #e3e322;
       font-size: 18px;
       font-weight: bold;
+      &.add-time {
+        color: #ef9535;
+      }
+      &.decrease-time {
+        color: #ff4d4f;
+      }
     }
   }
 `;
