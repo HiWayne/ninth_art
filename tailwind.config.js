@@ -9,7 +9,7 @@ export default {
             opacity: 0,
             transform: "scale(0)",
           },
-          "70%": {
+          "80%": {
             opacity: 1,
             transform: "scale(1.3)",
           },

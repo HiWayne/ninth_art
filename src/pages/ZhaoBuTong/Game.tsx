@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { Flex } from "@/shared/components";
-import { randomNumber, randomlyTaken } from "@/shared/utils";
+import { random, randomNumber, randomlyTaken } from "@/shared/utils";
 import useStore from "@/store";
 import styled from "styled-components";
 import shallow from "zustand/shallow";
@@ -20,7 +20,7 @@ import {
   Stars,
   InfoPop,
   BackButton,
-  HelpButton,
+  PropsPackage,
 } from "./components";
 import {
   REMAINING_TIME,
@@ -30,6 +30,7 @@ import {
   SAVED_TOTAL_STARS,
   charList,
   savedLevelsScoreRef,
+  savedProps,
 } from "@/store/zhaoBuTong";
 import correctIcon from "./assets/images/correct.png";
 import errorIcon from "./assets/images/error.png";
@@ -116,18 +117,22 @@ const ZhaoBuTong = styled(() => {
     setCurrentLevel,
     shaking,
     setShaking,
-    gamePropsCount,
-    setGamePropsCount,
+    helpPropsCount,
+    setHelpPropsCount,
     setTotalStars,
+    timePropsCount,
+    setTimePropsCount,
   } = useStore(
     (state) => ({
       currentLevel: state.zhaoBuTong.currentLevel,
       setCurrentLevel: state.zhaoBuTong.setCurrentLevel,
       shaking: state.zhaoBuTong.shaking,
       setShaking: state.zhaoBuTong.setShaking,
-      gamePropsCount: state.zhaoBuTong.gamePropsCount,
-      setGamePropsCount: state.zhaoBuTong.setGamePropsCount,
+      helpPropsCount: state.zhaoBuTong.helpPropsCount,
+      setHelpPropsCount: state.zhaoBuTong.setHelpPropsCount,
       setTotalStars: state.zhaoBuTong.setTotalStars,
+      timePropsCount: state.zhaoBuTong.timePropsCount,
+      setTimePropsCount: state.zhaoBuTong.setTimePropsCount,
     }),
     shallow
   );
@@ -147,10 +152,10 @@ const ZhaoBuTong = styled(() => {
   const [failPopVisibility, setFailPopVisibility] = useState(false);
   const [infoPopVisibility, setInfoPopVisibility] = useState(false);
   const [infoText, setInfoText] = useState("");
-  // 本关使用了道具
-  const [usedProp, setUsedProp] = useState(false);
-  // 本关获得了道具
-  const [gotProp, setGotProp] = useState(false);
+  // 本关使用了提示道具
+  const [usedHelpProp, setUsedHelpProp] = useState(false);
+  // 本关获得了道具 0-没有、1-提示、2-时间
+  const [gotProp, setGotProp] = useState<0 | 1 | 2>(0);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [clickedPosition, setClickedPosition] = useState<Answers | null>(null);
@@ -160,6 +165,7 @@ const ZhaoBuTong = styled(() => {
   const timerRef = useRef<number | null>(null);
   const currentLevelStartTimeRef = useRef(Date.now());
   const speedTimeRef = useRef(0);
+  const propsPackageRef = useRef<HTMLElement>(null);
 
   const answers = useMemo<Answers>(() => {
     const row = randomNumber(0, ROW_COUNT - 1);
@@ -177,12 +183,12 @@ const ZhaoBuTong = styled(() => {
     setSuccess(false);
     setError(false);
     setClickedPosition(null);
-    setGotProp(false);
+    setGotProp(0);
     setSuccessPopVisibility(false);
     setFailPopVisibility(false);
     setInfoPopVisibility(false);
     setCurrentStars(3);
-    setUsedProp(false);
+    setUsedHelpProp(false);
     currentLevelStartTimeRef.current = Date.now();
     speedTimeRef.current = 0;
   }, [currentLevel]);
@@ -241,16 +247,24 @@ const ZhaoBuTong = styled(() => {
         setSuccess(true);
         // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具。本关已获得过道具除外
         let currentGotProp = false;
-        console.log(savedLevelsScoreRef.current[currentLevel]?.gotProp, usedProp, speedTimeRef.current)
         if (
           !savedLevelsScoreRef.current[currentLevel]?.gotProp &&
-          !usedProp &&
+          !usedHelpProp &&
           speedTimeRef.current <= 10000
         ) {
+          // 一半概率是提示道具，一半是时间道具
+          const isHelpProp = random(0.5);
           currentGotProp = true;
-          setGotProp(true);
-          setGamePropsCount(gamePropsCount + 1);
-          window.localStorage.setItem(SAVED_PROPS, `${gamePropsCount + 1}`);
+          if (isHelpProp) {
+            setGotProp(1);
+            setHelpPropsCount(helpPropsCount + 1);
+            savedProps.helpProps += 1;
+          } else {
+            setGotProp(2);
+            setTimePropsCount(timePropsCount + 1);
+            savedProps.timeProps += 1;
+          }
+          window.localStorage.setItem(SAVED_PROPS, JSON.stringify(savedProps));
         }
         if (!savedLevelsScoreRef.current[currentLevel]) {
           savedLevelsScoreRef.current[currentLevel] = {
@@ -309,14 +323,22 @@ const ZhaoBuTong = styled(() => {
         }, 1000);
       }
     },
-    [answers, remainingTime, gamePropsCount, usedProp, currentStars]
+    [
+      answers,
+      remainingTime,
+      helpPropsCount,
+      timePropsCount,
+      usedHelpProp,
+      currentStars,
+    ]
   );
 
   const openHelp = useCallback(() => {
-    if (gamePropsCount > 0) {
-      setUsedProp(true);
-      setGamePropsCount(gamePropsCount - 1);
-      window.localStorage.setItem(SAVED_PROPS, `${gamePropsCount - 1}`);
+    if (helpPropsCount > 0) {
+      setUsedHelpProp(true);
+      setHelpPropsCount(helpPropsCount - 1);
+      savedProps.helpProps -= 1;
+      window.localStorage.setItem(SAVED_PROPS, JSON.stringify(savedProps));
       setInfoPopVisibility(true);
       const helpTypeIsColumn = Math.random() < 0.5;
       const offset = randomlyTaken([-1, 0, 1], 1).result[0];
@@ -371,9 +393,9 @@ const ZhaoBuTong = styled(() => {
           ? `试着找找${helpRange.join(", ")}列里的字`
           : `线索在${helpRange.join(", ")}行里哦`
       );
-      setGamePropsCount(gamePropsCount - 1);
+      setHelpPropsCount(helpPropsCount - 1);
     }
-  }, [gamePropsCount, answers]);
+  }, [helpPropsCount, answers]);
 
   const closeHelp = useCallback(() => {
     setInfoPopVisibility(false);
@@ -433,8 +455,8 @@ const ZhaoBuTong = styled(() => {
               navigate("/games/zhaobutong/levels");
             }}
           />
-          <HelpButton onClick={openHelp}>
-            提示剩余
+          <PropsPackage onClick={openHelp} ref={propsPackageRef as any}>
+            剩余提示
             <img className="inline-block w-[60rem]" src={gamePropStaticIcon} />
             <span
               className="ml-[8rem] font-[Skranji-Bold]"
@@ -445,9 +467,9 @@ const ZhaoBuTong = styled(() => {
                 WebkitTextStroke: "2px #3a230a",
               }}
             >
-              {gamePropsCount}
+              {helpPropsCount}
             </span>
-          </HelpButton>
+          </PropsPackage>
         </Flex>
         <Flex justify="center" align="center" style={{ width: "100%" }}>
           <LevelInfo>
@@ -505,6 +527,7 @@ const ZhaoBuTong = styled(() => {
         onNext={goNextLevel}
         onRestart={restartLevel}
         gotProp={gotProp}
+        propMoveTargetRef={propsPackageRef}
       />
       <FailPop visibility={failPopVisibility} onClick={restartLevel} />
       <InfoPop

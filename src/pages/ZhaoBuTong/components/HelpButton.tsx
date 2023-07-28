@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const HelpButton = styled.div`
+export const PropsPackage = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: center;

@@ -23,10 +23,9 @@ import { LeftArrow, Level, Pagination, RightArrow } from "./components/Levels";
 const PAGE_SIZE = 10;
 
 const Levels = styled(() => {
-  const { currentLevel, gamePropsCount, totalStars } = useStore(
+  const { currentLevel, totalStars } = useStore(
     (state) => ({
       currentLevel: state.zhaoBuTong.currentLevel,
-      gamePropsCount: state.zhaoBuTong.gamePropsCount,
       totalStars: state.zhaoBuTong.totalStars,
     }),
     shallow
@@ -57,24 +56,12 @@ const Levels = styled(() => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    try {
-      savedLevelsScoreRef.current = JSON.parse(
-        window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
-      );
-    } catch {
-      savedLevelsScoreRef.current = {
-        0: {
-          level: 0,
-          score: null,
-          remainingTime: REMAINING_TIME,
-          speedTime: null,
-          minSpeedTime: null,
-          recordDate: null,
-          gotProp: false,
-        },
-      };
-    }
+  const gamePropsCount = useMemo(() => {
+    Object.keys(savedLevelsScoreRef.current).reduce(
+      (count, level) =>
+        count + (savedLevelsScoreRef.current[level as any]?.gotProp ? 1 : 0),
+      0
+    );
   }, []);
 
   return (
