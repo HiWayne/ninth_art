@@ -10,21 +10,21 @@ import {
   useMutableVerticalFenceCount,
   useRestaurantPosition,
 } from "../hooks";
-import { RightBottomEnclosedFence } from "./fence";
-import { BottomEnclosedFence } from "./fence/BottomEnclosedFence";
-import { FullyEnclosedFence } from "./fence/FullyEnclosedFence";
-import { GlassFence } from "./fence/GlassFence";
-import { GlassGap } from "./fence/GlassGap";
-import { HorizontalFence } from "./fence/HorizontalFence";
-import { KittyEndFence } from "./fence/KittyEndFence";
-import { KittyFence } from "./fence/KittyFence";
-import { KittyVerticalFence } from "./fence/KittyVerticalFence";
-import { LeftEnclosedFence } from "./fence/LeftEnclosedFence";
-import { LeftTopEnclosedFence } from "./fence/LeftTopEnclosedFence";
-import { RightEnclosedFence } from "./fence/RightEnclosedFence";
-import { RightTopEnclosedFence } from "./fence/RightTopEnclosedFence";
-import { TopEnclosedFence } from "./fence/TopEnclosedFence";
-import { VerticalFence } from "./fence/VerticalFence";
+import { RightBottomEnclosedFence } from "./Fence";
+import { BottomEnclosedFence } from "./Fence/BottomEnclosedFence";
+import { FullyEnclosedFence } from "./Fence/FullyEnclosedFence";
+import { GlassFence } from "./Fence/GlassFence";
+import { GlassGap } from "./Fence/GlassGap";
+import { HorizontalFence } from "./Fence/HorizontalFence";
+import { KittyEndFence } from "./Fence/KittyEndFence";
+import { KittyFence } from "./Fence/KittyFence";
+import { KittyVerticalFence } from "./Fence/KittyVerticalFence";
+import { LeftEnclosedFence } from "./Fence/LeftEnclosedFence";
+import { LeftTopEnclosedFence } from "./Fence/LeftTopEnclosedFence";
+import { RightEnclosedFence } from "./Fence/RightEnclosedFence";
+import { RightTopEnclosedFence } from "./Fence/RightTopEnclosedFence";
+import { TopEnclosedFence } from "./Fence/TopEnclosedFence";
+import { VerticalFence } from "./Fence/VerticalFence";
 
 const repeat = (count: number) => new Array(count).fill(1);
 
