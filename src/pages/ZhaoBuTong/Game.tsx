@@ -21,6 +21,7 @@ import {
   InfoPop,
   BackButton,
   PropsPackage,
+  PropsSelector,
 } from "./components";
 import {
   REMAINING_TIME,
@@ -35,6 +36,8 @@ import {
 import correctIcon from "./assets/images/correct.png";
 import errorIcon from "./assets/images/error.png";
 import gamePropStaticIcon from "./assets/images/game_prop_static.png";
+import magnifierIcon from "./assets/images/magnifier.png";
+import alarmClockIcon from "./assets/images/alarm_clock.png";
 import skranjiBoldFont from "./assets/fonts/Skranji-Bold.otf";
 
 interface Answers {
@@ -54,7 +57,7 @@ const LevelInfo = styled.div`
 
 const CurrentChar = styled.div`
   position: absolute;
-  left: -52px;
+  left: -100rem;
   top: 50%;
   transform: translate(-100%, -50%);
   color: #000;
@@ -62,8 +65,8 @@ const CurrentChar = styled.div`
 `;
 
 const LevelText = styled.div`
-  margin-left: 20px;
-  margin-right: 4px;
+  margin-left: 38rem;
+  margin-right: 8rem;
   color: #995f31;
   font-size: 14px;
   font-weight: bold;
@@ -72,9 +75,9 @@ const LevelText = styled.div`
 const Grid = styled(({ className, children }) => (
   <div className={className}>{children}</div>
 ))`
-  margin-top: 8px;
-  padding-right: 8px;
-  padding-bottom: 8px;
+  margin-top: 16rem;
+  padding-right: 16rem;
+  padding-bottom: 16rem;
   border: 1px solid #6d604f;
   background: #f8f6e7;
 `;
@@ -94,17 +97,17 @@ const GridItem = styled<
 ))`
   position: relative;
   display: inline-block;
-  margin-left: 8px;
-  margin-top: 8px;
-  padding: 2px;
+  margin-left: 16rem;
+  margin-top: 16rem;
+  padding: 4rem;
   font-size: 20px;
   color: #030303;
   cursor: pointer;
   ${(props) =>
     props.success
-      ? `&::after {content: ""; position: absolute; bottom: 0; left: 60%; transform: translateX(-50%); z-index: 1; width: 24px; height: 24px; background: url("${correctIcon}") center / contain no-repeat;}`
+      ? `&::after {content: ""; position: absolute; bottom: 0; left: 60%; transform: translateX(-50%); z-index: 1; width: 46rem; height: 46rem; background: url("${correctIcon}") center / contain no-repeat;}`
       : props.error
-      ? `&::after {content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 1; width: 24px; height: 24px; background: url("${errorIcon}") center / contain no-repeat;}`
+      ? `&::after {content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 1; width: 46rem; height: 46rem; background: url("${errorIcon}") center / contain no-repeat;}`
       : ""}
 `;
 
@@ -152,8 +155,8 @@ const ZhaoBuTong = styled(() => {
   const [failPopVisibility, setFailPopVisibility] = useState(false);
   const [infoPopVisibility, setInfoPopVisibility] = useState(false);
   const [infoText, setInfoText] = useState("");
-  // 本关使用了提示道具
-  const [usedHelpProp, setUsedHelpProp] = useState(false);
+  // 本关使用了道具
+  const [usedProp, setUsedProp] = useState(false);
   // 本关获得了道具 0-没有、1-提示、2-时间
   const [gotProp, setGotProp] = useState<0 | 1 | 2>(0);
   const [success, setSuccess] = useState(false);
@@ -161,11 +164,14 @@ const ZhaoBuTong = styled(() => {
   const [clickedPosition, setClickedPosition] = useState<Answers | null>(null);
   const [currentStars, setCurrentStars] = useState(3);
   const [replayCounts, setReplayCounts] = useState(0);
+  const [propsSelectorVisibility, setPropsSelectorVisibility] = useState(false);
+  const [addTimeByProp, setAddTimeByProp] = useState(0);
 
   const timerRef = useRef<number | null>(null);
   const currentLevelStartTimeRef = useRef(Date.now());
   const speedTimeRef = useRef(0);
   const propsPackageRef = useRef<HTMLElement>(null);
+  const clickLockedRef = useRef(false);
 
   const answers = useMemo<Answers>(() => {
     const row = randomNumber(0, ROW_COUNT - 1);
@@ -188,9 +194,11 @@ const ZhaoBuTong = styled(() => {
     setFailPopVisibility(false);
     setInfoPopVisibility(false);
     setCurrentStars(3);
-    setUsedHelpProp(false);
+    setUsedProp(false);
+    setAddTimeByProp(0);
     currentLevelStartTimeRef.current = Date.now();
     speedTimeRef.current = 0;
+    clickLockedRef.current = false;
   }, [currentLevel]);
 
   // 重玩本关
@@ -208,19 +216,21 @@ const ZhaoBuTong = styled(() => {
       const extractTime = randomNumber(30000, 60000);
       const nextLevelTime = remainingTime + extractTime;
       window.localStorage.setItem(SAVED_LEVEL, `${currentLevel + 1}`);
-      savedLevelsScoreRef.current[currentLevel + 1] = {
-        level: currentLevel + 1,
-        score: null,
-        remainingTime: nextLevelTime,
-        speedTime: null,
-        minSpeedTime: null,
-        recordDate: null,
-        gotProp: false,
-      };
-      window.localStorage.setItem(
-        SAVED_LEVELS_SCORE,
-        JSON.stringify(savedLevelsScoreRef.current)
-      );
+      if (!savedLevelsScoreRef.current[currentLevel + 1]) {
+        savedLevelsScoreRef.current[currentLevel + 1] = {
+          level: currentLevel + 1,
+          score: null,
+          remainingTime: nextLevelTime,
+          speedTime: null,
+          minSpeedTime: null,
+          recordDate: null,
+          gotProp: false,
+        };
+        window.localStorage.setItem(
+          SAVED_LEVELS_SCORE,
+          JSON.stringify(savedLevelsScoreRef.current)
+        );
+      }
       setCurrentLevel(currentLevel + 1);
       setAddTime(extractTime);
       setRemainingTime(nextLevelTime);
@@ -234,7 +244,7 @@ const ZhaoBuTong = styled(() => {
 
   const handleClickChar = useCallback(
     (receivedAnswers: Answers) => {
-      if (remainingTime <= 0) {
+      if (remainingTime <= 0 || clickLockedRef.current) {
         return;
       }
       setClickedPosition(receivedAnswers);
@@ -245,11 +255,12 @@ const ZhaoBuTong = styled(() => {
       ) {
         clearTimeout(timerRef.current!);
         setSuccess(true);
+        const speedTimeTruly = Date.now() - currentLevelStartTimeRef.current;
         // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具。本关已获得过道具除外
         let currentGotProp = false;
         if (
           !savedLevelsScoreRef.current[currentLevel]?.gotProp &&
-          !usedHelpProp &&
+          !usedProp &&
           speedTimeRef.current <= 10000
         ) {
           // 一半概率是提示道具，一半是时间道具
@@ -282,26 +293,25 @@ const ZhaoBuTong = styled(() => {
           (savedLevelsScoreRef.current[currentLevel].score &&
             currentStars > savedLevelsScoreRef.current[currentLevel].score!)
         ) {
+          savedLevelsScoreRef.current[currentLevel].score = currentStars;
           const savedTotalStars =
             window.localStorage.getItem(SAVED_TOTAL_STARS) || "0";
           const totalStars = currentStars + parseInt(savedTotalStars);
           setTotalStars(totalStars);
           window.localStorage.setItem(SAVED_TOTAL_STARS, `${totalStars}`);
         }
-        savedLevelsScoreRef.current[currentLevel].score = currentStars;
-        savedLevelsScoreRef.current[currentLevel].speedTime =
-          speedTimeRef.current;
+        savedLevelsScoreRef.current[currentLevel].speedTime = speedTimeTruly;
         if (!savedLevelsScoreRef.current[currentLevel].gotProp) {
           savedLevelsScoreRef.current[currentLevel].gotProp = currentGotProp;
         }
         if (
           !savedLevelsScoreRef.current[currentLevel].minSpeedTime ||
           (savedLevelsScoreRef.current[currentLevel].minSpeedTime &&
-            speedTimeRef.current <
+            speedTimeTruly <
               savedLevelsScoreRef.current[currentLevel].minSpeedTime!)
         ) {
           savedLevelsScoreRef.current[currentLevel].minSpeedTime =
-            speedTimeRef.current;
+            speedTimeTruly;
           savedLevelsScoreRef.current[currentLevel].recordDate = Date.now();
         }
         window.localStorage.setItem(
@@ -310,6 +320,7 @@ const ZhaoBuTong = styled(() => {
         );
         setSuccessPopVisibility(true);
       } else {
+        clickLockedRef.current = true;
         setShaking(true);
         setError(true);
         // 罚时
@@ -317,6 +328,7 @@ const ZhaoBuTong = styled(() => {
         setDecreaseTime(2000);
         currentLevelStartTimeRef.current -= 2000;
         setTimeout(() => {
+          clickLockedRef.current = false;
           setShaking(false);
           setError(false);
           setDecreaseTime(0);
@@ -328,17 +340,22 @@ const ZhaoBuTong = styled(() => {
       remainingTime,
       helpPropsCount,
       timePropsCount,
-      usedHelpProp,
+      usedProp,
       currentStars,
     ]
   );
 
-  const openHelp = useCallback(() => {
-    if (helpPropsCount > 0) {
-      setUsedHelpProp(true);
-      setHelpPropsCount(helpPropsCount - 1);
+  const openPropsSelector = useCallback(() => {
+    setPropsSelectorVisibility(true);
+  }, []);
+
+  const useHelpProp = useCallback(() => {
+    if (savedProps.helpProps > 0) {
+      setUsedProp(true);
+      setHelpPropsCount(savedProps.helpProps - 1);
       savedProps.helpProps -= 1;
       window.localStorage.setItem(SAVED_PROPS, JSON.stringify(savedProps));
+      setPropsSelectorVisibility(false);
       setInfoPopVisibility(true);
       const helpTypeIsColumn = Math.random() < 0.5;
       const offset = randomlyTaken([-1, 0, 1], 1).result[0];
@@ -393,9 +410,54 @@ const ZhaoBuTong = styled(() => {
           ? `试着找找${helpRange.join(", ")}列里的字`
           : `线索在${helpRange.join(", ")}行里哦`
       );
-      setHelpPropsCount(helpPropsCount - 1);
     }
-  }, [helpPropsCount, answers]);
+  }, [answers]);
+
+  // 使用时间道具
+  const useTimeProp = useCallback(() => {
+    if (savedProps.timeProps <= 0) {
+      return;
+    }
+    setUsedProp(true);
+    setPropsSelectorVisibility(false);
+    // 剩余时间增加一分钟
+    setRemainingTime((time) => time + 60000);
+    // 减少本关花费时间一分钟
+    setAddTimeByProp(60000);
+    setAddTime(60000);
+    setTimePropsCount(savedProps.timeProps - 1);
+    savedProps.timeProps -= 1;
+    window.localStorage.setItem(SAVED_PROPS, JSON.stringify(savedProps));
+    setTimeout(() => {
+      setAddTime(0);
+    }, 2000);
+  }, []);
+
+  const gameProps = useMemo(
+    () => [
+      {
+        icon: magnifierIcon,
+        desc: "效果：给出线索提示",
+        number: helpPropsCount,
+        effect: useHelpProp,
+      },
+      {
+        icon: alarmClockIcon,
+        desc: "效果：回溯60秒时间",
+        number: timePropsCount,
+        effect: useTimeProp,
+      },
+    ],
+    [useHelpProp, useTimeProp, helpPropsCount, timePropsCount]
+  );
+
+  const currentLevelBestStarsHistory = useMemo(() => {
+    if (!savedLevelsScoreRef.current[currentLevel]?.score) {
+      return 0;
+    } else {
+      return savedLevelsScoreRef.current[currentLevel].score!;
+    }
+  }, [currentLevel, replayCounts]);
 
   const closeHelp = useCallback(() => {
     setInfoPopVisibility(false);
@@ -415,22 +477,33 @@ const ZhaoBuTong = styled(() => {
       if (!failPopVisibility) {
         setFailPopVisibility(true);
       }
+    } else {
+      if (failPopVisibility) {
+        setFailPopVisibility(false);
+      }
     }
     return () => clearTimeout(timerRef.current!);
   }, [currentLevel, replayCounts, remainingTime, infoPopVisibility]);
 
   useEffect(() => {
-    speedTimeRef.current = Date.now() - currentLevelStartTimeRef.current;
+    speedTimeRef.current = Math.max(
+      Date.now() - currentLevelStartTimeRef.current - addTimeByProp,
+      0
+    );
     let score: number;
     if (speedTimeRef.current <= 60000) {
       score = 3;
     } else if (speedTimeRef.current <= 90000) {
       score = 2;
     } else {
-      score = 1;
+      if (remainingTime <= 0) {
+        score = 0;
+      } else {
+        score = 1;
+      }
     }
     setCurrentStars(score);
-  }, [remainingTime]);
+  }, [remainingTime, addTimeByProp]);
 
   return (
     <Wrapper>
@@ -445,8 +518,8 @@ const ZhaoBuTong = styled(() => {
           align="center"
           style={{
             width: "100%",
-            margin: "20px 0",
-            padding: "0 28px",
+            margin: "38rem 0",
+            padding: "0 54rem",
             boxSizing: "border-box",
           }}
         >
@@ -455,10 +528,20 @@ const ZhaoBuTong = styled(() => {
               navigate("/games/zhaobutong/levels");
             }}
           />
-          <PropsPackage onClick={openHelp} ref={propsPackageRef as any}>
-            剩余提示
-            <img className="inline-block w-[60rem]" src={gamePropStaticIcon} />
-            <span
+          <PropsPackage
+            onClick={openPropsSelector}
+            ref={propsPackageRef as any}
+          >
+            <div className="flex flex-col justify-start items-center">
+              <img
+                className="inline-block w-[120rem]"
+                src={gamePropStaticIcon}
+              />
+              <span className="translate-x-[8rem] font-bold text-[#444]">
+                背包
+              </span>
+            </div>
+            {/* <span
               className="ml-[8rem] font-[Skranji-Bold]"
               style={{
                 color: "#fff",
@@ -468,7 +551,7 @@ const ZhaoBuTong = styled(() => {
               }}
             >
               {helpPropsCount}
-            </span>
+            </span> */}
           </PropsPackage>
         </Flex>
         <Flex justify="center" align="center" style={{ width: "100%" }}>
@@ -521,15 +604,28 @@ const ZhaoBuTong = styled(() => {
           ))}
         </Grid>
       </Flex>
-      <SuccessPop
-        visibility={successPopVisibility}
-        stars={currentStars}
-        onNext={goNextLevel}
-        onRestart={restartLevel}
-        gotProp={gotProp}
-        propMoveTargetRef={propsPackageRef}
-      />
-      <FailPop visibility={failPopVisibility} onClick={restartLevel} />
+      {propsSelectorVisibility ? (
+        <PropsSelector
+          gameProps={gameProps}
+          onClose={() => {
+            setPropsSelectorVisibility(false);
+          }}
+        />
+      ) : null}
+      {successPopVisibility ? (
+        <SuccessPop
+          visibility={successPopVisibility}
+          stars={currentStars}
+          bestStarsHistory={currentLevelBestStarsHistory}
+          onNext={goNextLevel}
+          onRestart={restartLevel}
+          gotProp={gotProp}
+          propMoveTargetRef={propsPackageRef}
+        />
+      ) : null}
+      {failPopVisibility ? (
+        <FailPop visibility={failPopVisibility} onClick={restartLevel} />
+      ) : null}
       <InfoPop
         visibility={infoPopVisibility}
         title="提示"

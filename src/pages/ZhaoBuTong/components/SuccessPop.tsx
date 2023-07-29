@@ -13,23 +13,34 @@ import nextLevelIcon from "../assets/images/next.png";
 import starIcon from "../assets/images/star.png";
 import magnifierIcon from "../assets/images/magnifier.png";
 import alarmClockIcon from "../assets/images/alarm_clock.png";
+import { LiquidStars } from "./LiquidStars";
 
 const TOTAL_STARS = 3;
 
 export const SuccessPop: FC<{
   visibility: boolean;
   stars: number;
+  bestStarsHistory: number;
   onNext: () => void;
   onRestart: () => void;
   gotProp: 0 | 1 | 2;
   propMoveTargetRef: RefObject<HTMLElement>;
-}> = ({ visibility, stars, onNext, onRestart, gotProp, propMoveTargetRef }) => {
+}> = ({
+  visibility,
+  stars,
+  bestStarsHistory,
+  onNext,
+  onRestart,
+  gotProp,
+  propMoveTargetRef,
+}) => {
   const [star1Animation, setStar1Animation] = useState(false);
   const [star2Animation, setStar2Animation] = useState(false);
   const [star3Animation, setStar3Animation] = useState(false);
 
   const overflowValueRef = useRef("");
-  const propRef = useRef<HTMLDivElement>(null);
+  const propRef = useRef<HTMLImageElement>(null);
+  const liquidStarsStartDomRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (visibility) {
@@ -38,10 +49,10 @@ export const SuccessPop: FC<{
       setStar1Animation(true);
       const timer2 = setTimeout(() => {
         setStar2Animation(true);
-      }, 800);
+      }, 600);
       const timer3 = setTimeout(() => {
         setStar3Animation(true);
-      }, 1600);
+      }, 1200);
       return () => {
         document.body.style.overflow = overflowValueRef.current;
         clearTimeout(timer2);
@@ -57,7 +68,7 @@ export const SuccessPop: FC<{
 
   useEffect(() => {
     if (visibility && gotProp) {
-      const ANIMATION_DURATION = 800;
+      const ANIMATION_DURATION = 1000;
       const FRAME_TIME = 16;
       let timer2: number | null = null;
       const timer = setTimeout(() => {
@@ -88,7 +99,7 @@ export const SuccessPop: FC<{
             }
           }, FRAME_TIME);
         }
-      }, 1100);
+      }, 4200);
       return () => {
         if (propRef.current) {
           propRef.current.style.display = "none";
@@ -108,10 +119,12 @@ export const SuccessPop: FC<{
 
   return (
     <>
-      <div
-        style={visibility ? { display: "flex" } : { display: "none" }}
-        className="w-[100vw] h-[-webkit-fill-available] fixed top-0 left-0 z-[999] bg-[rgba(0,_0,_0,_0.4)] flex flex-col justify-center items-center"
-      >
+      <div className="w-[100vw] h-[-webkit-fill-available] fixed top-0 left-0 z-[999] bg-[rgba(0,_0,_0,_0.6)] flex flex-col justify-center items-center">
+        <LiquidStars
+          count={stars}
+          bestStarsHistory={bestStarsHistory}
+          delay={2600}
+        />
         <div className="translate-y-[120rem] flex justify-center items-center">
           {Array.from({ length: TOTAL_STARS }).map((_, index) => (
             <img
@@ -120,31 +133,32 @@ export const SuccessPop: FC<{
               }${
                 starAnimations[index]
                   ? index + 1 <= stars
-                    ? " animate-[0.6s_star-show_1s_ease-in_forwards]"
-                    : " animate-[0.6s_inactive-star-show_1s_ease-in_forwards]"
+                    ? " animate-[0.6s_star-show_0.6s_ease-in_forwards]"
+                    : " animate-[0.6s_inactive-star-show_0.6s_ease-in_forwards]"
                   : ""
               }`}
               style={
                 index + 1 <= stars ? undefined : { filter: "brightness(0)" }
               }
+              ref={index === 1 ? liquidStarsStartDomRef : undefined}
               key={index}
               src={starIcon}
             />
           ))}
         </div>
         <img
-          className="w-[80%] opacity-0 scale-0 animate-[inactive-star-show_1s_ease-in-out_forwards]"
+          className="w-[80%] opacity-0 scale-0 animate-[enlarge_0.8s_ease-in-out_forwards]"
           src={victory1Icon}
         />
         {gotProp ? (
-          <div className="flex justify-start items-center translate-x-[-16px] translate-y-[-20rem] opacity-0 animate-[1s_opacity-show_1s_ease-in-out_forwards]">
-            <img className="w-[100px] h-[100px]" src={gamePropIcon} />
-            <span className="ml-[12px] translate-y-[20px] text-[#fff] font-bold text-[16px]">
+          <div className="flex justify-start items-center translate-x-[-31rem] translate-y-[-20rem] opacity-0 animate-[0.6s_opacity-show_4s_ease-in-out_forwards]">
+            <img className="w-[192rem]" src={gamePropIcon} />
+            <span className="ml-[23rem] translate-y-[38rem] text-[#fff] font-bold text-[16px]">
               获得道具x1
             </span>
             <img
-              ref="propRef"
-              className="hidden absolute z-[99] left-[48rem] top-[50%] w-[48rem]"
+              ref={propRef}
+              className="hidden absolute z-[99] left-[72rem] top-[calc(50%_-_36rem)] w-[60rem]"
               src={
                 gotProp === 1
                   ? magnifierIcon
@@ -155,14 +169,14 @@ export const SuccessPop: FC<{
             />
           </div>
         ) : null}
-        <div className="mt-[12px] flex justify-center items-center opacity-0 scale-0 animate-[inactive-star-show_1s_ease-in-out_forwards]">
+        <div className="mt-[23rem] flex justify-center items-center opacity-0 scale-0 animate-[enlarge_0.8s_ease-in-out_forwards]">
           <img
-            className="w-[80px] cursor-pointer"
+            className="w-[154rem] cursor-pointer"
             src={restartIcon}
             onClick={onRestart}
           />
           <img
-            className="ml-[60px] w-[80px] cursor-pointer"
+            className="ml-[80rem] w-[154rem] cursor-pointer"
             src={nextLevelIcon}
             onClick={onNext}
           />

@@ -28,15 +28,14 @@ export const FailPop: FC<{ visibility: boolean; onClick: () => void }> = ({
 
   return (
     <div
-      style={visibility ? { display: "flex" } : { display: "none" }}
       className={
-        "flex flex-col justify-center items-center fixed left-0 top-0 z-[999] bg-[rgba(0,_0,_0,_0.4)] w-[100vw] h-[-webkit-fill-available]"
+        "flex flex-col justify-center items-center fixed left-0 top-0 z-[999] bg-[rgba(0,_0,_0,_0.6)] w-[100vw] h-[-webkit-fill-available]"
       }
     >
       <div
-        className={`translate-y-[60rem] flex justify-center items-center opacity-0 scale-0${
+        className={`translate-y-[72rem] flex justify-center items-center opacity-0 scale-0${
           animation
-            ? " animate-[1s_inactive-star-show_1s_ease-in-out_forwards]"
+            ? " animate-[0.8s_inactive-star-show_0.8s_ease-in-out_forwards]"
             : ""
         }`}
       >
@@ -52,11 +51,11 @@ export const FailPop: FC<{ visibility: boolean; onClick: () => void }> = ({
         ))}
       </div>
       <img
-        className="w-[90%] ml-[16px] opacity-0 scale-0 animate-[star-show_1s_ease-in-out_forwards]"
+        className="w-[90%] ml-[31rem] opacity-0 scale-0 animate-[rebound_0.8s_ease-in-out_forwards]"
         src={failIcon}
       />
       <img
-        className="mt-[12px] cursor-pointer w-[80px] opacity-0 scale-0 animate-[1s_inactive-star-show_2s_ease-in-out_forwards]"
+        className="mt-[23rem] cursor-pointer w-[154rem] opacity-0 scale-0 animate-[0.8s_enlarge_1.6s_ease-in-out_forwards]"
         src={restartIcon}
         onClick={onClick}
       />
