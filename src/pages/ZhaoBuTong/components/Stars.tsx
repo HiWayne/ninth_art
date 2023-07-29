@@ -8,12 +8,12 @@ export const Star = styled<FC<{ className?: string; light: boolean; size: number
   }
 )`
   display: inline-block;
-  width: ${(props) => props.size}px;
-  height: ${(props) => props.size}px;
+  width: ${(props) => props.size}rem;
+  height: ${(props) => props.size}rem;
   background: url("${starIcon}") center / contain no-repeat;
   ${(props) => (!props.light ? "filter: brightness(0);" : "")}
   & + & {
-    margin-left: 4px;
+    margin-left: 8rem;
   }
 `;
 
@@ -24,7 +24,7 @@ export const Stars = styled<
     style?: CSSProperties;
     size?: number;
   }>
->(({ className, counts, style, size = 24 }) => {
+>(({ className, counts, style, size = 46 }) => {
   return (
     <div className={className} style={style}>
       {Array.from({ length: 3 }).map((_, index) => (

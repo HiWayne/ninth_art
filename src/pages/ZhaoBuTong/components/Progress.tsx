@@ -47,8 +47,8 @@ export const Progress = styled<
     );
   }
 )`
-  margin-top: 4px;
-  padding: 4px 12px 4px 36px;
+  margin-top: 8rem;
+  padding: 8rem 23rem 8rem 69rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -56,14 +56,14 @@ export const Progress = styled<
   box-sizing: border-box;
   & > .progress-bar {
     display: inline-flex;
-    width: calc(100% - 76px);
-    height: 12px;
-    border-radius: 8px;
+    width: calc(100% - 146rem);
+    height: 23rem;
+    border-radius: 16rem;
     & > span {
       display: inline-block;
       height: 100%;
       background-color: #ef9535;
-      border-radius: 8px;
+      border-radius: 16rem;
       transition: width 1s linear;
     }
   }
@@ -71,11 +71,11 @@ export const Progress = styled<
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    min-width: 70px;
-    height: 20px;
+    min-width: 135rem;
+    height: 38rem;
     color: #1b1d12;
     & > span {
-      margin-left: 4px;
+      margin-left: 8rem;
       transition: opacity 0.3s ease-out;
       font-size: 18px;
       font-weight: bold;

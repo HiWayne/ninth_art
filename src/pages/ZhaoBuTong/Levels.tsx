@@ -3,13 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import useStore from "@/store";
 import shallow from "zustand/shallow";
-import {
-  REMAINING_TIME,
-  SAVED_LEVELS_SCORE,
-  SAVED_PROPS,
-  charList,
-  savedLevelsScoreRef,
-} from "@/store/zhaoBuTong";
+import { charList, savedLevelsScoreRef } from "@/store/zhaoBuTong";
 import bg from "./assets/images/levels/bg.png";
 import closeIcon from "./assets/images/levels/close.png";
 import backIcon from "./assets/images/levels/back_btn.png";
@@ -23,10 +17,9 @@ import { LeftArrow, Level, Pagination, RightArrow } from "./components/Levels";
 const PAGE_SIZE = 10;
 
 const Levels = styled(() => {
-  const { currentLevel, gamePropsCount, totalStars } = useStore(
+  const { currentLevel, totalStars } = useStore(
     (state) => ({
       currentLevel: state.zhaoBuTong.currentLevel,
-      gamePropsCount: state.zhaoBuTong.gamePropsCount,
       totalStars: state.zhaoBuTong.totalStars,
     }),
     shallow
@@ -57,24 +50,12 @@ const Levels = styled(() => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    try {
-      savedLevelsScoreRef.current = JSON.parse(
-        window.localStorage.getItem(SAVED_LEVELS_SCORE) || ""
-      );
-    } catch {
-      savedLevelsScoreRef.current = {
-        0: {
-          level: 0,
-          score: null,
-          remainingTime: REMAINING_TIME,
-          speedTime: null,
-          minSpeedTime: null,
-          recordDate: null,
-          gotProp: false,
-        },
-      };
-    }
+  const gamePropsCount = useMemo(() => {
+    return Object.keys(savedLevelsScoreRef.current).reduce(
+      (count, level) =>
+        count + (savedLevelsScoreRef.current[level as any]?.gotProp ? 1 : 0),
+      0
+    );
   }, []);
 
   return (
@@ -97,7 +78,7 @@ const Levels = styled(() => {
         <div className="mt-[12rem] flex justify-start items-center w-[240rem]">
           <img className="inline-block w-[128rem]" src={gamePropStaticIcon} />
           <span
-            className="ml-[12rem] font-[Skranji-Bold] text-[#fff] text-[24px]"
+            className="mt-[4rem] ml-[16rem] font-[Skranji-Bold] text-[#fff] text-[24px]"
             style={{ WebkitTextStroke: "2px #3a230a" }}
           >
             {gamePropsCount}
@@ -106,7 +87,7 @@ const Levels = styled(() => {
       </div>
 
       <div className="relative w-[700rem] translate-y-[-72rem]">
-        <img src={bg} />
+        <img className="inline-block w-[100%]" src={bg} />
         <div className="ml-[-12rem] absolute overflow-hidden left-[86rem] top-[140rem] w-[550rem]">
           <div
             style={{ transform: `translateX(-${currentPage * 550}rem)` }}

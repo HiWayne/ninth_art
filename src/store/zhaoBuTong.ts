@@ -1,10 +1,12 @@
 export interface ZhaoBuTongStore {
   currentLevel: number;
-  gamePropsCount: number;
+  helpPropsCount: number;
+  timePropsCount: number;
   shaking: boolean;
   totalStars: number;
   setShaking: (shaking: boolean) => void;
-  setGamePropsCount: (count: number) => void;
+  setHelpPropsCount: (count: number) => void;
+  setTimePropsCount: (count: number) => void;
   setCurrentLevel: (index: number) => void;
   setTotalStars: (stars: number) => void;
 }
@@ -17,7 +19,13 @@ export const SAVED_PROPS = "SAVED_PROPS";
 export const SAVED_TOTAL_STARS = "SAVED_TOTAL_STARS";
 
 const currentLevel = window.localStorage.getItem(SAVED_LEVEL) || "0";
-const savedProps = window.localStorage.getItem(SAVED_PROPS) || `0`;
+// 游戏道具
+export let savedProps: { helpProps: number; timeProps: number };
+try {
+  savedProps = JSON.parse(window.localStorage.getItem(SAVED_PROPS) || "");
+} catch {
+  savedProps = { helpProps: 0, timeProps: 0 };
+}
 const savedTotalStars = window.localStorage.getItem(SAVED_TOTAL_STARS) || `0`;
 
 export let savedLevelsScoreRef: {
@@ -59,7 +67,8 @@ const createZhaoBuTongStore: (
   ) => void
 ) => ZhaoBuTongStore = (set) => ({
   currentLevel: parseInt(currentLevel),
-  gamePropsCount: parseInt(savedProps),
+  helpPropsCount: savedProps.helpProps,
+  timePropsCount: savedProps.timeProps,
   shaking: false,
   totalStars: parseInt(savedTotalStars),
   setShaking(shaking) {
@@ -67,9 +76,14 @@ const createZhaoBuTongStore: (
       state.zhaoBuTong.shaking = shaking;
     });
   },
-  setGamePropsCount(count) {
+  setHelpPropsCount(count) {
     set((state) => {
-      state.zhaoBuTong.gamePropsCount = count;
+      state.zhaoBuTong.helpPropsCount = count;
+    });
+  },
+  setTimePropsCount(count) {
+    set((state) => {
+      state.zhaoBuTong.timePropsCount = count;
     });
   },
   setCurrentLevel(index) {
