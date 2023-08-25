@@ -14,6 +14,8 @@ import starIcon from "../assets/images/star.png";
 import magnifierIcon from "../assets/images/magnifier.png";
 import alarmClockIcon from "../assets/images/alarm_clock.png";
 import { LiquidStars } from "./LiquidStars";
+import useStore from "@/store";
+import { charList } from "@/store/zhaoBuTong";
 
 const TOTAL_STARS = 3;
 
@@ -34,6 +36,8 @@ export const SuccessPop: FC<{
   gotProp,
   propMoveTargetRef,
 }) => {
+  const currentLevel = useStore((store) => store.zhaoBuTong.currentLevel);
+
   const [star1Animation, setStar1Animation] = useState(false);
   const [star2Animation, setStar2Animation] = useState(false);
   const [star3Animation, setStar3Animation] = useState(false);
@@ -170,16 +174,26 @@ export const SuccessPop: FC<{
           </div>
         ) : null}
         <div className="mt-[23rem] flex justify-center items-center opacity-0 scale-0 animate-[enlarge_0.8s_ease-in-out_forwards]">
-          <img
-            className="w-[154rem] cursor-pointer"
-            src={restartIcon}
-            onClick={onRestart}
-          />
-          <img
-            className="ml-[80rem] w-[154rem] cursor-pointer"
-            src={nextLevelIcon}
-            onClick={onNext}
-          />
+          {currentLevel < charList.length - 1 ? (
+            <>
+              <img
+                className="w-[154rem] cursor-pointer"
+                src={restartIcon}
+                onClick={onRestart}
+              />
+              <img
+                className="ml-[80rem] w-[154rem] cursor-pointer"
+                src={nextLevelIcon}
+                onClick={onNext}
+              />
+            </>
+          ) : (
+            <img
+              className="w-[154rem] cursor-pointer"
+              src={restartIcon}
+              onClick={onRestart}
+            />
+          )}
         </div>
       </div>
     </>

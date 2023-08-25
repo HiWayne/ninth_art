@@ -18,7 +18,7 @@
 
 ## 技术栈
 
-vite、React17、react-pixi、react-router6、zustand、styled-component
+vite、React17、react-pixi、react-router6、zustand、styled-component、tailwind.css
 
 ## 本地运行
 

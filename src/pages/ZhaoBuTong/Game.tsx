@@ -212,8 +212,8 @@ const ZhaoBuTong = styled(() => {
   const goNextLevel = useCallback(() => {
     if (currentLevel < charList.length - 1) {
       resetLevel();
-      // 下一关时间在本关剩余时间基础上增加30~60秒
-      const extractTime = randomNumber(30000, 60000);
+      // 下一关时间在本关剩余时间基础上增加10~20秒
+      const extractTime = randomNumber(10000, 20000);
       const nextLevelTime = remainingTime + extractTime;
       window.localStorage.setItem(SAVED_LEVEL, `${currentLevel + 1}`);
       if (!savedLevelsScoreRef.current[currentLevel + 1]) {
@@ -256,12 +256,12 @@ const ZhaoBuTong = styled(() => {
         clearTimeout(timerRef.current!);
         setSuccess(true);
         const speedTimeTruly = Date.now() - currentLevelStartTimeRef.current;
-        // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具。本关已获得过道具除外
+        // 如果在不使用道具的情况下，20秒内找出答案，奖励一个道具。本关已获得过道具除外
         let currentGotProp = false;
         if (
           !savedLevelsScoreRef.current[currentLevel]?.gotProp &&
           !usedProp &&
-          speedTimeRef.current <= 10000
+          speedTimeRef.current <= 20000
         ) {
           // 一半概率是提示道具，一半是时间道具
           const isHelpProp = random(0.5);
