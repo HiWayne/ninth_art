@@ -3,12 +3,18 @@ import styled from "styled-components";
 import Grid from "@/shared/components/Grid";
 import Title from "@/shared/components/Title";
 import gameIcon from "assets/images/game.svg";
+import toolIcon from "assets/images/tool.svg";
 
 const channels = [
   {
     image: gameIcon,
-    name: "选择游戏",
+    name: "游戏",
     path: "/game",
+  },
+  {
+    image: toolIcon,
+    name: "创意工具",
+    path: "/tools",
   },
 ];
 

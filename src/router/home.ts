@@ -1,11 +1,10 @@
 import { RouteType } from "./index";
-// import Home from "pages/Home";
-import GamesCollect from "@/pages/GamesCollect";
+import Home from "pages/Home";
 
 const homeRoutes: RouteType[] = [
   {
     path: "/",
-    element: GamesCollect,
+    element: Home,
   },
 ];
 

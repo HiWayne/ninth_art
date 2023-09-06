@@ -107,7 +107,7 @@ savedGameSettings = formatGameSettings(savedGameSettings);
 
 const createFuziStore: (
   set: (
-    nextStateOrUpdater: object | ((state: any) => void),
+    nextStateOrUpdater: object | ((state: FuziStore) => void),
     shouldReplace?: boolean | undefined
   ) => void
 ) => FuziStore = (set) => ({
@@ -126,96 +126,96 @@ const createFuziStore: (
   shaking: false,
   setShaking(shaking) {
     set((state) => {
-      state.fuzi.shaking = shaking;
+      state.shaking = shaking;
     });
   },
   setTotalNeedFinding(totalNeedFinding: number | TotalNeedFindingComputer) {
     set((state) => {
       if (typeof totalNeedFinding === "function") {
-        state.fuzi.totalNeedFinding = totalNeedFinding(
-          state.fuzi.totalNeedFinding
+        state.totalNeedFinding = totalNeedFinding(
+          state.totalNeedFinding
         );
       } else {
-        state.fuzi.totalNeedFinding = totalNeedFinding;
+        state.totalNeedFinding = totalNeedFinding;
       }
     });
   },
   setFuzi(index: number, part: Partial<Fuzi>) {
     set((state) => {
-      const fuzi = state.fuzi.fuziCards[index];
+      const fuzi = state.fuziCards[index];
       if (fuzi) {
-        state.fuzi.fuziCards[index] = { ...fuzi, ...part };
+        state.fuziCards[index] = { ...fuzi, ...part };
       }
     });
   },
   setCountNoFind(countNoFind: number) {
     set((state) => {
-      state.fuzi.countNoFind = countNoFind;
+      state.countNoFind = countNoFind;
     });
   },
   addCountNoFind() {
     set((state) => {
-      state.fuzi.countNoFind += 1;
+      state.countNoFind += 1;
     });
   },
   decreaseCountNoFind() {
     set((state) => {
-      state.fuzi.countNoFind -= 1;
+      state.countNoFind -= 1;
     });
   },
   setRemainingTime(remainingTime: number) {
     set((state) => {
-      state.fuzi.remainingTime = remainingTime;
+      state.remainingTime = remainingTime;
     });
   },
   setSpeededTime(speededTime: number) {
     set((state) => {
-      state.fuzi.speededTime = speededTime;
+      state.speededTime = speededTime;
     });
   },
   setOvertime(time: number | ((prevTime: number) => number)) {
     set((state) => {
       if (typeof time === "function") {
-        state.fuzi.overtime = time(state.fuzi.overtime);
+        state.overtime = time(state.overtime);
       } else {
-        state.fuzi.overtime = time;
+        state.overtime = time;
       }
     });
   },
   setTimePenalty(time: number | ((prevTime: number) => number)) {
     set((state) => {
       if (typeof time === "function") {
-        state.fuzi.timePenalty = time(state.fuzi.timePenalty);
+        state.timePenalty = time(state.timePenalty);
       } else {
-        state.fuzi.timePenalty = time;
+        state.timePenalty = time;
       }
     });
   },
   addRemainingTime(interval: number) {
     set((state) => {
-      if (state.fuzi.remainingTime > 0) {
-        state.fuzi.remainingTime += interval;
+      if (state.remainingTime > 0) {
+        state.remainingTime += interval;
       }
     });
   },
   decreaseRemainingTime(interval: number) {
     set((state) => {
-      if (state.fuzi.remainingTime > 0) {
-        state.fuzi.remainingTime -= interval;
+      if (state.remainingTime > 0) {
+        state.remainingTime -= interval;
       }
-      if (state.fuzi.remainingTime <= 0) {
-        state.fuzi.remainingTime = 0;
+      if (state.remainingTime <= 0) {
+        state.remainingTime = 0;
       }
     });
   },
   setGameResult(gameResult: GameResultEnum) {
     set((state) => {
-      state.fuzi.gameResult = gameResult;
+      state.gameResult = gameResult;
     });
   },
   setFuziCards(fuziCards: Fuzi[]) {
     set((state) => {
-      state.fuzi.fuziCards = fuziCards;
+      state.fuziCards = fuziCards;
     });
   },
 });

@@ -62,7 +62,7 @@ try {
 
 const createZhaoBuTongStore: (
   set: (
-    nextStateOrUpdater: object | ((state: any) => void),
+    nextStateOrUpdater: object | ((state: ZhaoBuTongStore) => void),
     shouldReplace?: boolean | undefined
   ) => void
 ) => ZhaoBuTongStore = (set) => ({
@@ -73,27 +73,27 @@ const createZhaoBuTongStore: (
   totalStars: parseInt(savedTotalStars),
   setShaking(shaking) {
     set((state) => {
-      state.zhaoBuTong.shaking = shaking;
+      state.shaking = shaking;
     });
   },
   setHelpPropsCount(count) {
     set((state) => {
-      state.zhaoBuTong.helpPropsCount = count;
+      state.helpPropsCount = count;
     });
   },
   setTimePropsCount(count) {
     set((state) => {
-      state.zhaoBuTong.timePropsCount = count;
+      state.timePropsCount = count;
     });
   },
   setCurrentLevel(index) {
     set((state) => {
-      state.zhaoBuTong.currentLevel = index;
+      state.currentLevel = index;
     });
   },
   setTotalStars(stars) {
     set((state) => {
-      state.zhaoBuTong.totalStars = stars;
+      state.totalStars = stars;
     });
   },
 });

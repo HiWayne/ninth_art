@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "@fireworks-js/react": "^2.0.0",
     "@inlet/react-pixi": "^6.8.0",
     "@pixi/constants": "6.5.1",
@@ -21,6 +22,7 @@
     "@pixi/settings": "6.5.1",
     "@pixi/ticker": "^6.5.1",
     "@pixi/utils": "6.5.1",
+    "antd": "^5.8.6",
     "antd-mobile": "^5.32.0",
     "dayjs": "^1.11.5",
     "fireworks-js": "^2.10.7",

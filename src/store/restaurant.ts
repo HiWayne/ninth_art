@@ -19,7 +19,7 @@ export interface RestaurantStore {
 
 const createRestaurant: (
   set: (
-    nextStateOrUpdater: object | ((state: any) => void),
+    nextStateOrUpdater: object | ((state: RestaurantStore) => void),
     shouldReplace?: boolean | undefined
   ) => void
 ) => RestaurantStore = (set) => ({
@@ -29,26 +29,26 @@ const createRestaurant: (
   version: 0,
   setRestaurant(restaurant: Restaurant) {
     set((state) => {
-      if (state.restaurant.restaurant === null) {
-        state.restaurant.restaurant = restaurant;
+      if (state.restaurant === null) {
+        state.restaurant = restaurant;
       }
     });
   },
   setGame(game: Game) {
     set((state) => {
-      if (state.restaurant.game === null) {
-        state.restaurant.game = game;
+      if (state.game === null) {
+        state.game = game;
       }
     });
   },
   setIsEditing(status: boolean) {
     set((state) => {
-      state.restaurant.isEditing = status;
+      state.isEditing = status;
     });
   },
   update() {
     set((state) => {
-      state.restaurant.version++;
+      state.version++;
     });
   },
 });
