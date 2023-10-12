@@ -2,7 +2,7 @@ import {
   CSSProperties,
   FC,
   MouseEventHandler,
-  PointerEventHandler,
+  TouchEventHandler,
   useCallback,
   useEffect,
   useMemo,
@@ -92,7 +92,7 @@ const Canvas = () => {
     eraserDraw,
   } = useEraser();
 
-  const onPointerDown = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+  const onPointerDown = useCallback<TouchEventHandler<HTMLCanvasElement>>(
     (e) => {
       if (currentTool === "BRUSH") {
         onBrushPointerDown(e);
@@ -103,9 +103,9 @@ const Canvas = () => {
     [currentTool, onBrushPointerDown, onEraserPointerDown]
   );
 
-  const onPointerMove = useMemo<PointerEventHandler<HTMLCanvasElement>>(
+  const onPointerMove = useMemo<TouchEventHandler<HTMLCanvasElement>>(
     () =>
-      throttling<PointerEventHandler<HTMLCanvasElement>>((e) => {
+      throttling<TouchEventHandler<HTMLCanvasElement>>((e) => {
         if (currentTool === "BRUSH") {
           onBrushPointerMove(e);
         } else if (currentTool === "ERASER") {
@@ -115,7 +115,7 @@ const Canvas = () => {
     [currentTool, onBrushPointerMove, onEraserPointerMove]
   );
 
-  const onPointerUp = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+  const onPointerUp = useCallback<TouchEventHandler<HTMLCanvasElement>>(
     (e) => {
       if (currentTool === "BRUSH") {
         onBrushPointerUp(e);
@@ -178,21 +178,29 @@ const Canvas = () => {
     }
   }, [currentTool, segBrushLineWidth, segEraserLineWidth]);
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
-    <div className="flex justify-between items-center select-none">
+    <div className="flex flex-col justify-start items-center select-none">
       <canvas
-        className="w-[1000px] h-[100vh] border-[1px] border-solid border-[#eee]"
-        width={1000}
-        height={window.innerHeight}
+        className="w-[100vw] h-[50vh] border-[1px] border-solid border-[#eee]"
+        width={window.innerWidth}
+        height={window.innerHeight / 2}
         ref={canvasRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
+        onTouchStart={onPointerDown}
+        onTouchMove={onPointerMove}
+        onTouchEnd={onPointerUp}
       />
-      <div className="p-[12px] w-[400px]">
+      <div className="p-[12px] w-[100vw] h-[50vh] overflow-y-auto">
         <Form>
-          <Form.Item label="历史记录">
-            <div>
+          <h1 className="text-[20px] font-bold m-0 p-0">画板</h1>
+          <Form.Item label="撤销/前进" className="mt-[12px]">
+            <div className="inline-flex justify-start items-center translate-x-[-26rem]">
               <UndoOutlined
                 style={
                   currentHistoryIndex === -1
@@ -227,7 +235,7 @@ const Canvas = () => {
               />
             </div>
           </Form.Item>
-          <Form.Item className="mt-[48px]" label="笔刷粗细">
+          <Form.Item className="mt-[12px]" label="笔刷粗细">
             <div className="flex justify-center items-center">
               <Dot size={8} color="#8ee89e" style={{ marginRight: "8px" }} />
               <Slider
@@ -253,7 +261,7 @@ const Canvas = () => {
               />
             </div>
           </Form.Item>
-          <Form.Item className="mt-[24px]" label="笔刷颜色">
+          <Form.Item className="mt-[6px]" label="笔刷颜色">
             <div className="mt-[-8px] ml-[-8px] flex flex-wrap justify-start items-center">
               {colorList.map((color, index) => (
                 <Dot
@@ -268,7 +276,7 @@ const Canvas = () => {
                         : "1px solid #eee",
                     boxShadow:
                       currentTool === "BRUSH" && index === selectedDotIndex
-                        ? `0 0 4px ${color}`
+                        ? `0 0 8px 2px ${color}`
                         : undefined,
                     cursor: "pointer",
                   }}
@@ -281,7 +289,7 @@ const Canvas = () => {
               ))}
             </div>
           </Form.Item>
-          <Form.Item className="mt-[48px]" label="橡皮擦">
+          <Form.Item className="mt-[12px]" label="橡皮擦">
             <div className="flex justify-start items-center">
               <div
                 className="p-[8px] hover:bg-[#f7f7f7] rounded-[8px]"
@@ -302,7 +310,7 @@ const Canvas = () => {
               </div>
             </div>
           </Form.Item>
-          <Form.Item className="mt-[24px]" label="橡皮擦大小">
+          <Form.Item className="mt-[6px]" label="橡皮擦大小">
             <div className="flex justify-center items-center">
               <Dot size={8} color="#8ee89e" style={{ marginRight: "8px" }} />
               <Slider

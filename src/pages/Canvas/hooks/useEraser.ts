@@ -1,6 +1,6 @@
-import { PointerEventHandler, useCallback, useRef } from "react";
-import { shallow } from "zustand/shallow";
-import useStore from "~/store";
+import { TouchEventHandler, useCallback, useRef } from "react";
+import shallow from "zustand/shallow";
+import useStore from "@/store";
 
 export const useEraser = () => {
   const isEraserWorkingRef = useRef(false);
@@ -89,14 +89,14 @@ export const useEraser = () => {
     []
   );
 
-  const onPointerDown = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+  const onPointerDown = useCallback<TouchEventHandler<HTMLCanvasElement>>(
     (e) => {
       isEraserWorkingRef.current = true;
       const { top, left } = (
         e.target as HTMLCanvasElement
       ).getBoundingClientRect();
-      const x = e.clientX - left;
-      const y = e.clientY - top;
+      const x = e.touches[0].clientX - left;
+      const y = e.touches[0].clientY - top;
       if (!history[currentHistoryIndex]?.segEraserLinesList) {
         addHistory({
           segEraserLinesList: [
@@ -121,13 +121,13 @@ export const useEraser = () => {
     [segEraserLineWidth, history[currentHistoryIndex]?.segEraserLinesList]
   );
 
-  const onPointerMove = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+  const onPointerMove = useCallback<TouchEventHandler<HTMLCanvasElement>>(
     (e) => {
       const { top, left } = (
         e.target as HTMLCanvasElement
       ).getBoundingClientRect();
-      const x = e.clientX - left;
-      const y = e.clientY - top;
+      const x = e.touches[0].clientX - left;
+      const y = e.touches[0].clientY - top;
       if (isEraserWorkingRef.current) {
         setHistory((history, currentHistoryIndex) => {
           const segEraserLinesList =
@@ -144,29 +144,11 @@ export const useEraser = () => {
     []
   );
 
-  const onPointerUp = useCallback<PointerEventHandler<HTMLCanvasElement>>(
-    (e) => {
-      if (isEraserWorkingRef.current) {
-        isEraserWorkingRef.current = false;
-        const { top, left } = (
-          e.target as HTMLCanvasElement
-        ).getBoundingClientRect();
-        const x = e.clientX - left;
-        const y = e.clientY - top;
-        setHistory((history, currentHistoryIndex) => {
-          const segEraserLinesList =
-            history[currentHistoryIndex].segEraserLinesList;
-          if (segEraserLinesList) {
-            segEraserLinesList[segEraserLinesList.length - 1].points.push({
-              x,
-              y,
-            });
-          }
-        });
-      }
-    },
-    []
-  );
+  const onPointerUp = useCallback<TouchEventHandler<HTMLCanvasElement>>((e) => {
+    if (isEraserWorkingRef.current) {
+      isEraserWorkingRef.current = false;
+    }
+  }, []);
 
   return {
     isEraserWorkingRef,

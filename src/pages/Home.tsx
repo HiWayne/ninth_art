@@ -11,11 +11,11 @@ const channels = [
     name: "游戏",
     path: "/games",
   },
-  // {
-  //   image: toolIcon,
-  //   name: "创意工具",
-  //   path: "/tools",
-  // },
+  {
+    image: toolIcon,
+    name: "创意工具",
+    path: "/tools/canvas",
+  },
 ];
 
 const Wrapper = styled.div`

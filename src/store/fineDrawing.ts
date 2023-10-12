@@ -90,7 +90,7 @@ export const createFineDrawingStore: (
     shouldReplace?: boolean | undefined
   ) => void
 ) => FineDrawingStore = (set) => ({
-  currentTool: "",
+  currentTool: "BRUSH",
   setCurrentTool(tool) {
     set((state) => {
       state.currentTool = tool;

@@ -4,7 +4,7 @@ import { lazy } from "react";
 
 const Canvas = lazy(() => import("@/pages/Canvas/index"));
 
-const homeRoutes: RouteType[] = [
+const toolsRoutes: RouteType[] = [
   {
     path: "/tools",
     element: Layout,
@@ -17,4 +17,4 @@ const homeRoutes: RouteType[] = [
   },
 ];
 
-export default homeRoutes;
+export default toolsRoutes;

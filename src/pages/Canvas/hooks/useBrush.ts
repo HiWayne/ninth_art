@@ -1,6 +1,6 @@
-import { PointerEventHandler, useCallback, useRef } from "react";
-import { shallow } from "zustand/shallow";
-import useStore from "~/store";
+import { TouchEventHandler, useCallback, useRef } from "react";
+import shallow from "zustand/shallow";
+import useStore from "@/store";
 
 export const useBrush = () => {
   const isDrawingRef = useRef(false);
@@ -92,14 +92,14 @@ export const useBrush = () => {
     []
   );
 
-  const onPointerDown = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+  const onPointerDown = useCallback<TouchEventHandler<HTMLCanvasElement>>(
     (e) => {
       isDrawingRef.current = true;
       const { top, left } = (
         e.target as HTMLCanvasElement
       ).getBoundingClientRect();
-      const x = e.clientX - left;
-      const y = e.clientY - top;
+      const x = e.touches[0].clientX - left;
+      const y = e.touches[0].clientY - top;
       if (!history[currentHistoryIndex]?.segBrushLinesList) {
         addHistory({
           segBrushLinesList: [
@@ -130,13 +130,15 @@ export const useBrush = () => {
     ]
   );
 
-  const onPointerMove = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+  const onPointerMove = useCallback<TouchEventHandler<HTMLCanvasElement>>(
     (e) => {
+      console.log("move");
       const { top, left } = (
         e.target as HTMLCanvasElement
       ).getBoundingClientRect();
-      const x = e.clientX - left;
-      const y = e.clientY - top;
+      console.log(e);
+      const x = e.touches[0].clientX - left;
+      const y = e.touches[0].clientY - top;
       if (isDrawingRef.current) {
         setHistory((history, currentHistoryIndex) => {
           const segBrushLinesList =
@@ -153,29 +155,11 @@ export const useBrush = () => {
     []
   );
 
-  const onPointerUp = useCallback<PointerEventHandler<HTMLCanvasElement>>(
-    (e) => {
-      if (isDrawingRef.current) {
-        isDrawingRef.current = false;
-        const { top, left } = (
-          e.target as HTMLCanvasElement
-        ).getBoundingClientRect();
-        const x = e.clientX - left;
-        const y = e.clientY - top;
-        setHistory((history, currentHistoryIndex) => {
-          const segBrushLinesList =
-            history[currentHistoryIndex].segBrushLinesList;
-          if (segBrushLinesList) {
-            segBrushLinesList[segBrushLinesList.length - 1].points.push({
-              x,
-              y,
-            });
-          }
-        });
-      }
-    },
-    []
-  );
+  const onPointerUp = useCallback<TouchEventHandler<HTMLCanvasElement>>((e) => {
+    if (isDrawingRef.current) {
+      isDrawingRef.current = false;
+    }
+  }, []);
 
   return {
     isBrushDrawingRef: isDrawingRef,

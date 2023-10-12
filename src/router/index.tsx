@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import homeRoutes from "./home";
 import gamesRoutes from "./games";
+import toolsRoutes from "./tools";
 
 export interface RouteType {
   path?: string;
@@ -15,7 +16,11 @@ export interface RouteType {
 }
 
 // 路由列表
-export const routes: RouteType[] = [...homeRoutes, ...gamesRoutes];
+export const routes: RouteType[] = [
+  ...homeRoutes,
+  ...gamesRoutes,
+  ...toolsRoutes,
+];
 
 const renderNestRoute = (routes: RouteType[]) => {
   return routes.map((route) => {
