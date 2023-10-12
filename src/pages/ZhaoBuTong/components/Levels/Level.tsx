@@ -36,17 +36,6 @@ export const Level: FC<{
           if (locked) {
             return;
           }
-          // 从关卡选择列表进入时重置初始时间
-          if (
-            savedLevelsScoreRef.current[level] &&
-            savedLevelsScoreRef.current[level].remainingTime !== REMAINING_TIME
-          ) {
-            savedLevelsScoreRef.current[level].remainingTime = REMAINING_TIME;
-            window.localStorage.setItem(
-              SAVED_LEVELS_SCORE,
-              JSON.stringify(savedLevelsScoreRef.current)
-            );
-          }
           useStore.getState().zhaoBuTong.setCurrentLevel(level);
           window.localStorage.setItem(SAVED_LEVEL, `${level}`);
           navigate("/games/zhaobutong/start");

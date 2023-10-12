@@ -11,7 +11,7 @@ export interface ZhaoBuTongStore {
   setTotalStars: (stars: number) => void;
 }
 
-export const REMAINING_TIME = 120000; // 毫秒
+export const REMAINING_TIME = 60000; // 毫秒
 
 export const SAVED_LEVEL = "SAVED_LEVEL";
 export const SAVED_LEVELS_SCORE = "SAVED_LEVELS_SCORE";

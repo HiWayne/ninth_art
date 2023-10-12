@@ -9,13 +9,13 @@ const channels = [
   {
     image: gameIcon,
     name: "游戏",
-    path: "/game",
+    path: "/games",
   },
-  {
-    image: toolIcon,
-    name: "创意工具",
-    path: "/tools",
-  },
+  // {
+  //   image: toolIcon,
+  //   name: "创意工具",
+  //   path: "/tools",
+  // },
 ];
 
 const Wrapper = styled.div`

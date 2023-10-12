@@ -97,10 +97,10 @@ const GridItem = styled<
 ))`
   position: relative;
   display: inline-block;
-  margin-left: 16rem;
-  margin-top: 16rem;
+  margin-left: 8rem;
+  margin-top: 8rem;
   padding: 4rem;
-  font-size: 20px;
+  font-size: 28rem;
   color: #030303;
   cursor: pointer;
   ${(props) =>
@@ -111,8 +111,8 @@ const GridItem = styled<
       : ""}
 `;
 
-const ROW_COUNT = 10;
-const COLUMN_COUNT = 10;
+const ROW_COUNT = 20;
+const COLUMN_COUNT = 14;
 
 const ZhaoBuTong = styled(() => {
   const {
@@ -142,10 +142,24 @@ const ZhaoBuTong = styled(() => {
 
   const currentChars = useMemo(() => charList[currentLevel], [currentLevel]);
 
+  const lastLevelIndexPlayed = useMemo(() => {
+    let index = 0;
+    const list = Object.values(savedLevelsScoreRef.current);
+    for (let i = 0; i < list.length; i++) {
+      index = i;
+      if (!list[i].score) {
+        break;
+      }
+    }
+    return index;
+  }, [currentLevel]);
+
   const [successPopVisibility, setSuccessPopVisibility] = useState(false);
   const [remainingTime, setRemainingTime] = useState(
-    savedLevelsScoreRef.current[currentLevel]?.remainingTime
-      ? savedLevelsScoreRef.current[currentLevel].remainingTime
+    lastLevelIndexPlayed === currentLevel
+      ? savedLevelsScoreRef.current[currentLevel]?.remainingTime
+        ? savedLevelsScoreRef.current[currentLevel].remainingTime
+        : REMAINING_TIME
       : REMAINING_TIME
   );
   const [currentTotalGameTime, setCurrentTotalGameTime] =
@@ -212,8 +226,8 @@ const ZhaoBuTong = styled(() => {
   const goNextLevel = useCallback(() => {
     if (currentLevel < charList.length - 1) {
       resetLevel();
-      // 下一关时间在本关剩余时间基础上增加10~20秒
-      const extractTime = randomNumber(10000, 20000);
+      // 下一关时间在本关剩余时间基础上增加10~15秒
+      const extractTime = randomNumber(10000, 15000);
       const nextLevelTime = remainingTime + extractTime;
       window.localStorage.setItem(SAVED_LEVEL, `${currentLevel + 1}`);
       if (!savedLevelsScoreRef.current[currentLevel + 1]) {
@@ -253,15 +267,15 @@ const ZhaoBuTong = styled(() => {
         receivedAnswers.row === answers.row &&
         receivedAnswers.column === answers.column
       ) {
-        clearTimeout(timerRef.current!);
+        clearInterval(timerRef.current!);
         setSuccess(true);
         const speedTimeTruly = Date.now() - currentLevelStartTimeRef.current;
-        // 如果在不使用道具的情况下，20秒内找出答案，奖励一个道具。本关已获得过道具除外
+        // 如果在不使用道具的情况下，10秒内找出答案，奖励一个道具。本关已获得过道具除外
         let currentGotProp = false;
         if (
           !savedLevelsScoreRef.current[currentLevel]?.gotProp &&
           !usedProp &&
-          speedTimeRef.current <= 20000
+          speedTimeRef.current <= 10000
         ) {
           // 一半概率是提示道具，一半是时间道具
           const isHelpProp = random(0.5);
@@ -293,10 +307,14 @@ const ZhaoBuTong = styled(() => {
           (savedLevelsScoreRef.current[currentLevel].score &&
             currentStars > savedLevelsScoreRef.current[currentLevel].score!)
         ) {
+          // 当前分数和历史分数的差值
+          const starsOffset = savedLevelsScoreRef.current[currentLevel].score
+            ? currentStars - savedLevelsScoreRef.current[currentLevel].score!
+            : currentStars;
           savedLevelsScoreRef.current[currentLevel].score = currentStars;
           const savedTotalStars =
             window.localStorage.getItem(SAVED_TOTAL_STARS) || "0";
-          const totalStars = currentStars + parseInt(savedTotalStars);
+          const totalStars = starsOffset + parseInt(savedTotalStars);
           setTotalStars(totalStars);
           window.localStorage.setItem(SAVED_TOTAL_STARS, `${totalStars}`);
         }
@@ -420,11 +438,11 @@ const ZhaoBuTong = styled(() => {
     }
     setUsedProp(true);
     setPropsSelectorVisibility(false);
-    // 剩余时间增加一分钟
-    setRemainingTime((time) => time + 60000);
-    // 减少本关花费时间一分钟
-    setAddTimeByProp(60000);
-    setAddTime(60000);
+    // 剩余时间增加30秒
+    setRemainingTime((time) => time + 30000);
+    // 减少本关花费时间30秒
+    setAddTimeByProp(30000);
+    setAddTime(30000);
     setTimePropsCount(savedProps.timeProps - 1);
     savedProps.timeProps -= 1;
     window.localStorage.setItem(SAVED_PROPS, JSON.stringify(savedProps));
@@ -443,7 +461,7 @@ const ZhaoBuTong = styled(() => {
       },
       {
         icon: alarmClockIcon,
-        desc: "效果：回溯60秒时间",
+        desc: "效果：增加30秒时间",
         number: timePropsCount,
         effect: useTimeProp,
       },
@@ -466,14 +484,18 @@ const ZhaoBuTong = styled(() => {
 
   useEffect(() => {
     if (infoPopVisibility) {
-      clearTimeout(timerRef.current!);
+      clearInterval(timerRef.current!);
     } else {
-      timerRef.current = setTimeout(() => {
+      timerRef.current = setInterval(() => {
         setRemainingTime((time) => (time - 1000 < 0 ? 0 : time - 1000));
       }, 1000);
     }
+    return () => clearInterval(timerRef.current!);
+  }, [currentLevel, replayCounts, infoPopVisibility]);
+
+  useEffect(() => {
     if (remainingTime <= 0) {
-      clearTimeout(timerRef.current!);
+      clearInterval(timerRef.current!);
       if (!failPopVisibility) {
         setFailPopVisibility(true);
       }
@@ -482,8 +504,7 @@ const ZhaoBuTong = styled(() => {
         setFailPopVisibility(false);
       }
     }
-    return () => clearTimeout(timerRef.current!);
-  }, [currentLevel, replayCounts, remainingTime, infoPopVisibility]);
+  }, [remainingTime]);
 
   useEffect(() => {
     speedTimeRef.current = Math.max(
@@ -491,9 +512,9 @@ const ZhaoBuTong = styled(() => {
       0
     );
     let score: number;
-    if (speedTimeRef.current <= 60000) {
+    if (speedTimeRef.current <= 20000) {
       score = 3;
-    } else if (speedTimeRef.current <= 90000) {
+    } else if (speedTimeRef.current <= 40000) {
       score = 2;
     } else {
       if (remainingTime <= 0) {
