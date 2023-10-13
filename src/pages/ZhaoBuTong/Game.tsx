@@ -111,7 +111,7 @@ const GridItem = styled<
       : ""}
 `;
 
-const ROW_COUNT = 20;
+const ROW_COUNT = 14;
 const COLUMN_COUNT = 14;
 
 const ZhaoBuTong = styled(() => {
